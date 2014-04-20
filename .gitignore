@@ -1,2 +1,13 @@
 CMakeLists.txt.user
-
+moc_*
+memsgauge
+*.depends
+CPack*
+CMakeCache*
+CMakeFiles/
+Makefile
+cmake_install.*
+*.cbp
+*_automoc.cpp
+ui_*.h
+qrc_*_resources.cpp

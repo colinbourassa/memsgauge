@@ -3,16 +3,16 @@
 /**
  * Constructor. Receives a pointer to the QStyle of the parent form.
  */
-AboutBox::AboutBox(QStyle *parentStyle, QString title, libmems_version memsVersion, QWidget *parent) :
+AboutBox::AboutBox(QStyle *parentStyle, QString title, libmemsinjection_version version, QWidget *parent) :
     QDialog(parent),
     m_urlString(QString("http://code.google.com/p/memsgauge/")),
     m_urlLibString(QString("http://code.google.com/p/libmemsinjection/")),
     m_aboutString(QString("A graphical interface to the Rover Modular Engine Management System."))
 {
     this->setWindowTitle(title);
-    m_ver.major = memsVersion.major;
-    m_ver.minor = memsVersion.minor;
-    m_ver.patch = memsVersion.patch;
+    m_ver.major = version.major;
+    m_ver.minor = version.minor;
+    m_ver.patch = version.patch;
     m_style = parentStyle;
     setupWidgets();
 }

@@ -7,7 +7,7 @@
 #include <QLabel>
 #include <QStyle>
 #include <QString>
-#include "mems.h"
+#include "memsinjection.h"
 
 /**
  * The "About" dialog that shows information about the program.
@@ -17,7 +17,7 @@ class AboutBox : public QDialog
     Q_OBJECT
 
 public:
-    AboutBox(QStyle *parentStyle, QString title, libmems_version memsVersion, QWidget *parent);
+    AboutBox(QStyle *parentStyle, QString title, libmemsinjection_version version, QWidget *parent);
 
 private:
     void setupWidgets();
@@ -26,7 +26,7 @@ private:
     QStyle *m_style;
     QGridLayout *m_grid;
 
-    libmems_version m_ver;
+    libmemsinjection_version m_ver;
 
     const QString m_urlString;
     const QString m_urlLibString;
