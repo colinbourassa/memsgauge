@@ -51,28 +51,6 @@ void MEMSInterface::onFaultCodesClearRequested()
 }
 
 /**
- * Responds to a signal requesting that the fuel pump be turned on.
- */
-void MEMSInterface::onFuelPumpOnRequest()
-{
-    if (m_initComplete && mems_is_connected(&m_memsinfo))
-    {
-        mems_fuel_pump_control(&m_memsinfo, true);
-    }
-}
-
-/**
- * Responds to a signal requesting that the fuel pump be turned off.
- */
-void MEMSInterface::onFuelPumpOffRequest()
-{
-    if (m_initComplete && mems_is_connected(&m_memsinfo))
-    {
-        mems_fuel_pump_control(&m_memsinfo, false);
-    }
-}
-
-/**
  * Responds to a signal requesting that the idle air control valve be moved.
  * @param direction Direction of travel for the idle air control valve;
  *  0 to open and 1 to close
@@ -217,3 +195,42 @@ void MEMSInterface::runServiceLoop()
     }
 }
 
+void MEMSInterface::onFuelPumpControl(bool state)
+{
+    if (m_initComplete && mems_is_connected(&m_memsinfo))
+    {
+        mems_fuel_pump_control(&m_memsinfo, state);
+    }
+}
+
+void MEMSInterface::onPTCRelayControl(bool state)
+{
+    if (m_initComplete && mems_is_connected(&m_memsinfo))
+    {
+        mems_ptc_relay_control(&m_memsinfo, state);
+    }
+}
+
+void MEMSInterface::onACRelayControl(bool state)
+{
+    if (m_initComplete && mems_is_connected(&m_memsinfo))
+    {
+        mems_ac_relay_control(&m_memsinfo, state);
+    }
+}
+
+void MEMSInterface::onIgnitionCoilTest()
+{
+    if (m_initComplete && mems_is_connected(&m_memsinfo))
+    {
+        mems_test_coil(&m_memsinfo);
+    }
+}
+
+void MEMSInterface::onFuelInjectorTest()
+{
+    if (m_initComplete && mems_is_connected(&m_memsinfo))
+    {
+        mems_test_injectors(&m_memsinfo);
+    }
+}

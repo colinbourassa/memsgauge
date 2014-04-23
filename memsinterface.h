@@ -34,8 +34,12 @@ public slots:
     void onFaultCodesClearRequested();
     void onStartPollingRequest();
     void onShutdownThreadRequest();
-    void onFuelPumpOnRequest();
-    void onFuelPumpOffRequest();
+
+    void onFuelPumpControl(bool state);
+    void onPTCRelayControl(bool state);
+    void onACRelayControl(bool state);
+    void onIgnitionCoilTest();
+    void onFuelInjectorTest();
     void onIdleAirControlMovementRequest(int direction);
 
 signals:

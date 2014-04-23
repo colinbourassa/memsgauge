@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1050</width>
-    <height>610</height>
+    <width>869</width>
+    <height>526</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -18,484 +18,499 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>1050</width>
-    <height>610</height>
+    <width>800</width>
+    <height>400</height>
    </size>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0">
-     <layout class="QVBoxLayout" name="m_layoutMaster" stretch="0,1,0,2">
-      <item>
-       <layout class="QHBoxLayout" name="m_layoutTop" stretch="2,5">
-        <item>
-         <layout class="QHBoxLayout" name="m_connectButtonLayout">
-          <item>
-           <widget class="QPushButton" name="m_connectButton">
-            <property name="text">
-             <string>Connect</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="m_disconnectButton">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="text">
-             <string>Disconnect</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="m_statusLayout" stretch="0,3,0,3,0,3,0,0,0,0,1,0,0">
-          <item>
-           <widget class="Line" name="m_vline0">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="m_tuneRevNumberLabel">
-            <property name="text">
-             <string>Tune:</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="Line" name="m_vline1">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="m_identLabel">
-            <property name="text">
-             <string>Ident:</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="Line" name="m_vline2">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="m_checksumFixerLabel">
-            <property name="text">
-             <string>Checksum fixer:</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="Line" name="m_vline3">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="m_milLabel">
-            <property name="text">
-             <string>MIL:</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLedIndicator" name="m_milLed" native="true"/>
-          </item>
-          <item>
-           <widget class="Line" name="m_vline4">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="m_commsLedLabel">
-            <property name="text">
-             <string>Communications:</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLedIndicator" name="m_commsGoodLed" native="true"/>
-          </item>
-          <item>
-           <widget class="QLedIndicator" name="m_commsBadLed" native="true"/>
-          </item>
-         </layout>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QGridLayout" name="m_analogGaugeLayout">
-        <item row="0" column="0">
-         <widget class="ManoMeter" name="m_waterTempGauge" native="true"/>
-        </item>
-        <item row="0" column="1" rowspan="2">
-         <widget class="ManoMeter" name="m_speedo" native="true"/>
-        </item>
-        <item row="0" column="2" rowspan="2">
-         <widget class="ManoMeter" name="m_revCounter" native="true"/>
-        </item>
-        <item row="0" column="3">
-         <widget class="ManoMeter" name="m_airTempGauge" native="true"/>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="m_waterTempLabel">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Engine Temperature</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="3">
-         <widget class="QLabel" name="m_fuelTempLabel">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Intake Air Temperature</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <widget class="Line" name="m_hline1">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="m_layoutBottom" stretch="1,0,3">
-        <item>
-         <layout class="QGridLayout" name="m_miscDataLayout" rowstretch="0,0,0,0,0,0,0,0,0">
-          <item row="0" column="0">
-           <widget class="QLabel" name="m_mapReadingLabel">
-            <property name="text">
-             <string>MAP reading:</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1" colspan="3">
-           <widget class="QProgressBar" name="m_throttleBar">
-            <property name="value">
-             <number>0</number>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="m_throttleLabel">
-            <property name="text">
-             <string>Throttle position:</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1" colspan="3">
-           <widget class="QProgressBar" name="m_idleBypassPosBar">
-            <property name="value">
-             <number>0</number>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="m_idleBypassLabel">
-            <property name="text">
-             <string>Idle bypass position</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="m_targetIdleLabel">
-            <property name="text">
-             <string>Idle mode / target RPM:</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="QLedIndicator" name="m_idleModeLed" native="true"/>
-          </item>
-          <item row="3" column="2">
-           <widget class="QLabel" name="m_targetIdle">
-            <property name="text">
-             <string>0</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="1" colspan="2">
-           <widget class="QLabel" name="m_gear">
-            <property name="text">
-             <string>(no reading)</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0">
-           <widget class="QLabel" name="m_gearLabel">
-            <property name="text">
-             <string>Selected gear:</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="1">
-           <widget class="QLabel" name="m_voltage">
-            <property name="text">
-             <string>0.0V</string>
-            </property>
-           </widget>
-          </item>
-          <item row="6" column="0">
-           <widget class="QLabel" name="m_lambdaTrimTypeLabel">
-            <property name="text">
-             <string>Lambda trim type:</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="0">
-           <widget class="QLabel" name="m_voltageLabel">
-            <property name="text">
-             <string>Main voltage:</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="6" column="3">
-           <widget class="QRadioButton" name="m_lambdaTrimLongButton">
-            <property name="text">
-             <string>Long term</string>
-            </property>
-            <attribute name="buttonGroup">
-             <string notr="true">m_lambdaTrimButtonGroup</string>
-            </attribute>
-           </widget>
-          </item>
-          <item row="7" column="0">
-           <widget class="QLabel" name="m_oddFuelTrimLabel">
-            <property name="text">
-             <string>Lambda fuel trim:</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="6" column="1" colspan="2">
-           <widget class="QRadioButton" name="m_lambdaTrimShortButton">
-            <property name="text">
-             <string>Short term</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-            <attribute name="buttonGroup">
-             <string notr="true">m_lambdaTrimButtonGroup</string>
-            </attribute>
-           </widget>
-          </item>
-          <item row="7" column="2" colspan="2">
-           <widget class="FuelTrimBar" name="m_oddFuelTrimBar">
-            <property name="value">
-             <number>0</number>
-            </property>
-           </widget>
-          </item>
-          <item row="7" column="1">
-           <widget class="QLabel" name="m_oddFuelTrimBarLabel">
-            <property name="minimumSize">
-             <size>
-              <width>55</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>+0%</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="8" column="2">
-           <widget class="QLabel" name="m_lambdaTrimLowLimitLabel">
-            <property name="text">
-             <string>(less fuel)</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-            </property>
-           </widget>
-          </item>
-          <item row="8" column="3">
-           <widget class="QLabel" name="m_lambdaTrimHighLimitLabel">
-            <property name="text">
-             <string>(more fuel)</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QLabel" name="m_mapValue">
-            <property name="text">
-             <string>0 psi</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <widget class="Line" name="m_vline5">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <layout class="QGridLayout" name="m_fuelAndLoggingLayout">
-          <item row="0" column="0" alignment="Qt::AlignRight">
-           <widget class="QLedIndicator" name="m_fuelPumpRelayStateLed" native="true"/>
-          </item>
-          <item row="0" column="1">
-           <widget class="QLabel" name="m_fuelPumpRelayStateLabel">
-            <property name="text">
-             <string>Fuel pump relay</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0" colspan="4">
-           <widget class="Line" name="m_hline0">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="3">
-           <widget class="QPushButton" name="m_fuelPumpContinuousButton">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="text">
-             <string>Run pump (continuous)</string>
-            </property>
-            <property name="checkable">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="2">
-           <widget class="QPushButton" name="m_fuelPumpOneshotButton">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="text">
-             <string>Run pump (one shot)</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="2" colspan="2">
-           <widget class="QLineEdit" name="m_logFileNameBox"/>
-          </item>
-          <item row="3" column="2">
-           <widget class="QPushButton" name="m_startLoggingButton">
-            <property name="text">
-             <string>Start logging</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0" colspan="2">
-           <widget class="QLabel" name="m_logFileNameLabel">
-            <property name="text">
-             <string>Log file name:</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="3">
-           <widget class="QPushButton" name="m_stopLoggingButton">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="text">
-             <string>Stop logging</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-       </layout>
-      </item>
-     </layout>
-    </item>
-   </layout>
+   <widget class="QWidget" name="layoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>1</x>
+      <y>1</y>
+      <width>345</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="m_layoutTop" stretch="2,0">
+     <item>
+      <layout class="QHBoxLayout" name="m_connectButtonLayout">
+       <item>
+        <widget class="QPushButton" name="m_connectButton">
+         <property name="text">
+          <string>Connect</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="m_disconnectButton">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>Disconnect</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="m_statusLayout" stretch="0,3,0,1,0,0">
+       <item>
+        <widget class="Line" name="m_vline0">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="m_tuneRevNumberLabel">
+         <property name="text">
+          <string>Tune:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="Line" name="m_vline1">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="m_commsLedLabel">
+         <property name="text">
+          <string>Communications:</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLedIndicator" name="m_commsGoodLed" native="true"/>
+       </item>
+       <item>
+        <widget class="QLedIndicator" name="m_commsBadLed" native="true"/>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="layoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>50</y>
+      <width>391</width>
+      <height>341</height>
+     </rect>
+    </property>
+    <layout class="QGridLayout" name="m_gaugeLayout">
+     <item row="0" column="0">
+      <widget class="ManoMeter" name="m_revCounter" native="true"/>
+     </item>
+     <item row="0" column="1">
+      <widget class="ManoMeter" name="m_mapGauge" native="true"/>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="m_revCounterLabel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Engine Speed</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLabel" name="m_mapGaugeLabel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Manifold Pressure</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="ManoMeter" name="m_waterTempGauge" native="true"/>
+     </item>
+     <item row="2" column="1">
+      <widget class="ManoMeter" name="m_airTempGauge" native="true"/>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="m_waterTempLabel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Engine Temperature</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QLabel" name="m_fuelTempLabel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Intake Air Temperature</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="layoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>410</x>
+      <y>290</y>
+      <width>251</width>
+      <height>191</height>
+     </rect>
+    </property>
+    <layout class="QGridLayout" name="m_faultCodesLayout">
+     <item row="0" column="0" colspan="2">
+      <widget class="QLabel" name="m_faultCodesLabel">
+       <property name="text">
+        <string>Fault codes:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLedIndicator" name="m_faultLedCTS" native="true"/>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLabel" name="m_faultCode01Label">
+       <property name="text">
+        <string>(01) Coolant temp sensor</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLedIndicator" name="m_faultLedATS" native="true"/>
+     </item>
+     <item row="2" column="1">
+      <widget class="QLabel" name="m_faultCode02Label">
+       <property name="text">
+        <string>(02) Air temp sensor</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLedIndicator" name="m_faultLedFuelPump" native="true"/>
+     </item>
+     <item row="3" column="1">
+      <widget class="QLabel" name="m_faultCode10Label">
+       <property name="text">
+        <string>(10) Fuel pump ciruit</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLedIndicator" name="m_faultLedTps" native="true"/>
+     </item>
+     <item row="4" column="1">
+      <widget class="QLabel" name="m_faultCode16Label">
+       <property name="text">
+        <string>(16) Throttle position sensor</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="0">
+      <widget class="QLedIndicator" name="m_faultLedTpsSupply" native="true"/>
+     </item>
+     <item row="5" column="1">
+      <widget class="QLabel" name="m_faultCode17Label">
+       <property name="text">
+        <string>(17) Throttle position sensor supply</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="0">
+      <widget class="QLedIndicator" name="m_faultLedO2Heater" native="true"/>
+     </item>
+     <item row="6" column="1">
+      <widget class="QLabel" name="m_faultCode19Label">
+       <property name="text">
+        <string>(19) Oxygen sensor heater</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="0" colspan="2">
+      <widget class="QPushButton" name="m_clearFaultsButton">
+       <property name="text">
+        <string>Clear fault codes</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>430</x>
+      <y>50</y>
+      <width>222</width>
+      <height>113</height>
+     </rect>
+    </property>
+    <layout class="QGridLayout" name="m_miscDataLayout" rowstretch="0,0,0,0,0" columnstretch="0,0,1,0">
+     <item row="0" column="1" colspan="3">
+      <widget class="QProgressBar" name="m_throttleBar">
+       <property name="value">
+        <number>0</number>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="m_throttleLabel">
+       <property name="text">
+        <string>Throttle position:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1" colspan="3">
+      <widget class="QProgressBar" name="m_idleBypassPosBar">
+       <property name="value">
+        <number>0</number>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="m_idleBypassLabel">
+       <property name="text">
+        <string>Idle bypass position</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QLedIndicator" name="m_idleModeLed" native="true"/>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="m_targetIdleLabel">
+       <property name="text">
+        <string>Idle switch:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1" colspan="2">
+      <widget class="QLabel" name="m_gear">
+       <property name="text">
+        <string>(no reading)</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QLabel" name="m_voltage">
+       <property name="text">
+        <string>0.0V</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="m_gearLabel">
+       <property name="text">
+        <string>Selected gear:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="m_voltageLabel">
+       <property name="text">
+        <string>Main voltage:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>400</y>
+      <width>373</width>
+      <height>87</height>
+     </rect>
+    </property>
+    <layout class="QGridLayout" name="m_loggingLayout">
+     <item row="1" column="2">
+      <widget class="QPushButton" name="m_startLoggingButton">
+       <property name="text">
+        <string>Start logging</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="2" colspan="2">
+      <widget class="QLineEdit" name="m_logFileNameBox"/>
+     </item>
+     <item row="0" column="0" colspan="2">
+      <widget class="QLabel" name="m_logFileNameLabel">
+       <property name="text">
+        <string>Log file name:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="3">
+      <widget class="QPushButton" name="m_stopLoggingButton">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>Stop logging</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>670</x>
+      <y>281</y>
+      <width>178</width>
+      <height>207</height>
+     </rect>
+    </property>
+    <layout class="QGridLayout" name="m_actuatorLayout">
+     <item row="0" column="0">
+      <widget class="QSlider" name="m_iacPositionSlider">
+       <property name="maximum">
+        <number>100</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="invertedAppearance">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLabel" name="m_iacSetLabel">
+       <property name="text">
+        <string>0%</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0" colspan="2">
+      <widget class="Line" name="m_hline1">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="0" colspan="2">
+      <widget class="QPushButton" name="m_testPTCRelayButton">
+       <property name="text">
+        <string>PTC (manifold heater) relay</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0" colspan="2">
+      <widget class="QLabel" name="m_testActuatorLabel">
+       <property name="text">
+        <string>Test actuators:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0" colspan="2">
+      <widget class="QPushButton" name="m_testIdleBypassButton">
+       <property name="text">
+        <string>Move idle bypass motor</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0" colspan="2">
+      <widget class="QPushButton" name="m_testACRelayButton">
+       <property name="text">
+        <string>A/C relay</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="0" colspan="2">
+      <widget class="QPushButton" name="m_testFuelPumpRelayButton">
+       <property name="text">
+        <string>Fuel pump relay</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="0" colspan="2">
+      <widget class="QPushButton" name="m_testFuelInjectorButton">
+       <property name="text">
+        <string>Fuel injector(s)</string>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="0" colspan="2">
+      <widget class="QPushButton" name="m_testIgnitionCoilButton">
+       <property name="text">
+        <string>Ignition coil</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1050</width>
-     <height>25</height>
+     <width>869</width>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="m_fileMenu">
     <property name="title">
      <string>&amp;File</string>
     </property>
-    <addaction name="m_saveROMImageAction"/>
     <addaction name="separator"/>
     <addaction name="m_exitAction"/>
    </widget>
@@ -503,8 +518,6 @@
     <property name="title">
      <string>&amp;Options</string>
     </property>
-    <addaction name="m_showFaultCodesAction"/>
-    <addaction name="m_idleAirControlAction"/>
     <addaction name="m_editSettingsAction"/>
    </widget>
    <widget class="QMenu" name="m_helpMenu">
@@ -557,11 +570,6 @@
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>FuelTrimBar</class>
-   <extends>QProgressBar</extends>
-   <header>fueltrimbar.h</header>
-  </customwidget>
-  <customwidget>
    <class>ManoMeter</class>
    <extends>QWidget</extends>
    <header>manometer.h</header>
@@ -576,7 +584,4 @@
  </customwidgets>
  <resources/>
  <connections/>
- <buttongroups>
-  <buttongroup name="m_lambdaTrimButtonGroup"/>
- </buttongroups>
 </ui>

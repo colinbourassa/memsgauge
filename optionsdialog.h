@@ -25,7 +25,7 @@ public:
     OptionsDialog(QString title, QWidget *parent = 0);
     QString getSerialDeviceName();
     bool getSerialDeviceChanged() { return m_serialDeviceChanged; }
-    SpeedUnits getSpeedUnits() { return m_speedUnits; }
+    PressureUnits getPressureUnits() { return m_pressureUnits; }
     TemperatureUnits getTemperatureUnits() { return m_tempUnits; }
 
 protected:
@@ -39,8 +39,8 @@ private:
     QLabel *m_temperatureUnitsLabel;
     QComboBox *m_temperatureUnitsBox;
 
-    QLabel *m_speedUnitsLabel;
-    QComboBox *m_speedUnitsBox;
+    QLabel *m_pressureUnitsLabel;
+    QComboBox *m_pressureUnitsBox;
 
     QFrame *m_horizontalLineA;
 
@@ -51,7 +51,7 @@ private:
 
     QString m_serialDeviceName;
     TemperatureUnits m_tempUnits;
-    SpeedUnits m_speedUnits;
+    PressureUnits m_pressureUnits;
 
     bool m_serialDeviceChanged;
 
@@ -59,7 +59,7 @@ private:
     const QString m_settingsGroupName;
 
     const QString m_settingSerialDev;
-    const QString m_settingSpeedUnits;
+    const QString m_settingPressureUnits;
     const QString m_settingTemperatureUnits;
 
     void setupWidgets();

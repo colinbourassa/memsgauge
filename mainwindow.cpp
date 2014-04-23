@@ -11,7 +11,6 @@
 #include <QGraphicsOpacityEffect>
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "faultcodedialog.h"
 
 /**
  * Constructor; sets up main UI
@@ -28,18 +27,27 @@ MainWindow::MainWindow(QWidget *parent)
 {
     buildSpeedAndTempUnitTables();
     m_ui->setupUi(this);
-    this->setWindowTitle("RoverGauge");
+    this->setWindowTitle("MEMSGauge");
 
     m_options = new OptionsDialog(this->windowTitle(), this);
     m_mems = new MEMSInterface(m_options->getSerialDeviceName());
-
-    m_iacDialog = new IdleAirControlDialog(this->windowTitle(), this);
-    connect(m_iacDialog, SIGNAL(requestIdleAirControlMovement(int)),
-            m_mems, SLOT(onIdleAirControlMovementRequest(int)));
-
     m_logger = new Logger(m_mems);
 
-    m_fuelPumpCycleTimer = new QTimer(this);
+    m_fuelPumpTestTimer = new QTimer(this);
+    m_fuelPumpTestTimer->setInterval(2000);
+    m_fuelPumpTestTimer->setSingleShot(true);
+
+    m_acRelayTestTimer = new QTimer(this);
+    m_acRelayTestTimer->setInterval(2000);
+    m_acRelayTestTimer->setSingleShot(true);
+
+    m_ptcRelayTestTimer = new QTimer(this);
+    m_ptcRelayTestTimer->setInterval(2000);
+    m_ptcRelayTestTimer->setSingleShot(true);
+
+    connect(m_fuelPumpTestTimer, SIGNAL(timeout()), this, SLOT(onFuelPumpTestTimeout()));
+    connect(m_acRelayTestTimer,  SIGNAL(timeout()), this, SLOT(onACRelayTestTimeout()));
+    connect(m_ptcRelayTestTimer, SIGNAL(timeout()), this, SLOT(onPTCRelayTestTimeout()));
 
     connect(m_mems, SIGNAL(dataReady()), this, SLOT(onDataReady()));
     connect(m_mems, SIGNAL(connected()), this, SLOT(onConnect()));
@@ -49,11 +57,12 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_mems, SIGNAL(failedToConnect(QString)), this, SLOT(onFailedToConnect(QString)));
     connect(m_mems, SIGNAL(interfaceReadyForPolling()), this, SLOT(onInterfaceReady()));
     connect(m_mems, SIGNAL(notConnected()), this, SLOT(onNotConnected()));
-    connect(m_fuelPumpCycleTimer, SIGNAL(timeout()), m_mems, SLOT(onFuelPumpOffRequest()));
     connect(this, SIGNAL(requestToStartPolling()), m_mems, SLOT(onStartPollingRequest()));
     connect(this, SIGNAL(requestThreadShutdown()), m_mems, SLOT(onShutdownThreadRequest()));
-    connect(this, SIGNAL(requestFuelPumpOn()), m_mems, SLOT(onFuelPumpOnRequest()));
-    connect(this, SIGNAL(requestFuelPumpOff()), m_mems, SLOT(onFuelPumpOffRequest()));
+
+    connect(this, SIGNAL(acRelayControl(bool)), m_mems, SLOT(onACRelayControl(bool)));
+    connect(this, SIGNAL(fuelPumpControl(bool)), m_mems, SLOT(onFuelPumpControl(bool)));
+    connect(this, SIGNAL(ptcRelayControl(bool)), m_mems, SLOT(onPTCRelayControl(bool)));
 
     setWindowIcon(QIcon(":/icons/key.png"));
 
@@ -68,7 +77,7 @@ MainWindow::~MainWindow()
 {
     delete m_tempLimits;
     delete m_tempRange;
-    delete m_speedUnitSuffix;
+    delete m_pressureUnitSuffix;
     delete m_tempUnitSuffix;
     delete m_aboutBox;
     delete m_options;
@@ -81,9 +90,9 @@ MainWindow::~MainWindow()
  */
 void MainWindow::buildSpeedAndTempUnitTables()
 {
-    m_speedUnitSuffix = new QHash<SpeedUnits,QString>();
-    m_speedUnitSuffix->insert(MPH, " MPH");
-    m_speedUnitSuffix->insert(KPH, " km/h");
+    m_pressureUnitSuffix = new QHash<PressureUnits,QString>();
+    m_pressureUnitSuffix->insert(Psi, " psi");
+    m_pressureUnitSuffix->insert(KPa, " kPa");
 
     m_tempUnitSuffix = new QHash<TemperatureUnits,QString>;
     m_tempUnitSuffix->insert(Fahrenheit, " F");
@@ -104,9 +113,7 @@ void MainWindow::buildSpeedAndTempUnitTables()
 void MainWindow::setupWidgets()
 {
     // set menu and button icons
-    m_ui->m_saveROMImageAction->setIcon(style()->standardIcon(QStyle::SP_DialogSaveButton));
     m_ui->m_exitAction->setIcon(style()->standardIcon(QStyle::SP_DialogCloseButton));
-    m_ui->m_showFaultCodesAction->setIcon(style()->standardIcon(QStyle::SP_DialogNoButton));
     m_ui->m_editSettingsAction->setIcon(style()->standardIcon(QStyle::SP_ComputerIcon));
     m_ui->m_helpContentsAction->setIcon(style()->standardIcon(QStyle::SP_DialogHelpButton));
     m_ui->m_helpAboutAction->setIcon(style()->standardIcon(QStyle::SP_MessageBoxInformation));
@@ -114,26 +121,23 @@ void MainWindow::setupWidgets()
     m_ui->m_stopLoggingButton->setIcon(style()->standardIcon(QStyle::SP_MediaStop));
 
     // connect menu item signals
-    connect(m_ui->m_exitAction, SIGNAL(triggered()), this, SLOT(onExitSelected()));
-    connect(m_ui->m_idleAirControlAction, SIGNAL(triggered()), this, SLOT(onIdleAirControlClicked()));
-    connect(m_ui->m_editSettingsAction, SIGNAL(triggered()), this, SLOT(onEditOptionsClicked()));
-    connect(m_ui->m_helpContentsAction, SIGNAL(triggered()), this, SLOT(onHelpContentsClicked()));
-    connect(m_ui->m_helpAboutAction, SIGNAL(triggered()), this, SLOT(onHelpAboutClicked()));
+    connect(m_ui->m_exitAction,           SIGNAL(triggered()), this, SLOT(onExitSelected()));
+    connect(m_ui->m_editSettingsAction,   SIGNAL(triggered()), this, SLOT(onEditOptionsClicked()));
+    connect(m_ui->m_helpContentsAction,   SIGNAL(triggered()), this, SLOT(onHelpContentsClicked()));
+    connect(m_ui->m_helpAboutAction,      SIGNAL(triggered()), this, SLOT(onHelpAboutClicked()));
 
     // connect button signals
-    connect(m_ui->m_connectButton, SIGNAL(clicked()), this, SLOT(onConnectClicked()));
-    connect(m_ui->m_disconnectButton, SIGNAL(clicked()), this, SLOT(onDisconnectClicked()));
-    connect(m_ui->m_fuelPumpOneshotButton, SIGNAL(clicked()), this, SLOT(onFuelPumpOneshot()));
-    connect(m_ui->m_fuelPumpContinuousButton, SIGNAL(clicked()), this, SLOT(onFuelPumpContinuous()));
-    connect(m_ui->m_startLoggingButton, SIGNAL(clicked()), this, SLOT(onStartLogging()));
-    connect(m_ui->m_stopLoggingButton, SIGNAL(clicked()), this, SLOT(onStopLogging()));
+    connect(m_ui->m_connectButton,           SIGNAL(clicked()), this, SLOT(onConnectClicked()));
+    connect(m_ui->m_disconnectButton,        SIGNAL(clicked()), this, SLOT(onDisconnectClicked()));
+    connect(m_ui->m_startLoggingButton,      SIGNAL(clicked()), this, SLOT(onStartLogging()));
+    connect(m_ui->m_stopLoggingButton,       SIGNAL(clicked()), this, SLOT(onStopLogging()));
+    connect(m_ui->m_testACRelayButton,       SIGNAL(clicked()), this, SLOT(onTestACRelayClicked()));
+    connect(m_ui->m_testFuelPumpRelayButton, SIGNAL(clicked()), this, SLOT(onTestFuelPumpRelayClicked()));
+    connect(m_ui->m_testPTCRelayButton,      SIGNAL(clicked()), this, SLOT(onTestPTCRelayClicked()));
+    connect(m_ui->m_testIgnitionCoilButton,  SIGNAL(clicked()), m_mems, SLOT(onIgnitionCoilTest()));
+    connect(m_ui->m_testFuelInjectorButton,  SIGNAL(clicked()), m_mems, SLOT(onFuelInjectorTest()));
 
     // set the LED colors
-    m_ui->m_milLed->setOnColor1(QColor(255, 0, 0));
-    m_ui->m_milLed->setOnColor2(QColor(176, 0, 2));
-    m_ui->m_milLed->setOffColor1(QColor(20, 0, 0));
-    m_ui->m_milLed->setOffColor2(QColor(90, 0, 2));
-    m_ui->m_milLed->setDisabled(true);
     m_ui->m_commsGoodLed->setOnColor1(QColor(102, 255, 102));
     m_ui->m_commsGoodLed->setOnColor2(QColor(82, 204, 82));
     m_ui->m_commsGoodLed->setOffColor1(QColor(0, 102, 0));
@@ -148,22 +152,48 @@ void MainWindow::setupWidgets()
     m_ui->m_idleModeLed->setOnColor2(QColor(82, 204, 82));
     m_ui->m_idleModeLed->setOffColor1(QColor(0, 102, 0));
     m_ui->m_idleModeLed->setOffColor2(QColor(0, 51, 0));
-    m_ui->m_idleModeLed->setDisabled(true);
-    m_ui->m_fuelPumpRelayStateLed->setOnColor1(QColor(102, 255, 102));
-    m_ui->m_fuelPumpRelayStateLed->setOnColor2(QColor(82, 204, 82));
-    m_ui->m_fuelPumpRelayStateLed->setOffColor1(QColor(0, 102, 0));
-    m_ui->m_fuelPumpRelayStateLed->setOffColor2(QColor(0, 51, 0));
-    m_ui->m_fuelPumpRelayStateLed->setDisabled(true);
+    m_ui->m_idleModeLed->setDisabled(true);   
+
+    m_ui->m_faultLedATS->setOnColor1(QColor(255, 0, 0));
+    m_ui->m_faultLedATS->setOnColor2(QColor(176, 0, 2));
+    m_ui->m_faultLedATS->setOffColor1(QColor(20, 0, 0));
+    m_ui->m_faultLedATS->setOffColor2(QColor(90, 0, 2));
+    m_ui->m_faultLedATS->setDisabled(true);
+    m_ui->m_faultLedCTS->setOnColor1(QColor(255, 0, 0));
+    m_ui->m_faultLedCTS->setOnColor2(QColor(176, 0, 2));
+    m_ui->m_faultLedCTS->setOffColor1(QColor(20, 0, 0));
+    m_ui->m_faultLedCTS->setOffColor2(QColor(90, 0, 2));
+    m_ui->m_faultLedCTS->setDisabled(true);
+    m_ui->m_faultLedFuelPump->setOnColor1(QColor(255, 0, 0));
+    m_ui->m_faultLedFuelPump->setOnColor2(QColor(176, 0, 2));
+    m_ui->m_faultLedFuelPump->setOffColor1(QColor(20, 0, 0));
+    m_ui->m_faultLedFuelPump->setOffColor2(QColor(90, 0, 2));
+    m_ui->m_faultLedFuelPump->setDisabled(true);
+    m_ui->m_faultLedO2Heater->setOnColor1(QColor(255, 0, 0));
+    m_ui->m_faultLedO2Heater->setOnColor2(QColor(176, 0, 2));
+    m_ui->m_faultLedO2Heater->setOffColor1(QColor(20, 0, 0));
+    m_ui->m_faultLedO2Heater->setOffColor2(QColor(90, 0, 2));
+    m_ui->m_faultLedO2Heater->setDisabled(true);
+    m_ui->m_faultLedTps->setOnColor1(QColor(255, 0, 0));
+    m_ui->m_faultLedTps->setOnColor2(QColor(176, 0, 2));
+    m_ui->m_faultLedTps->setOffColor1(QColor(20, 0, 0));
+    m_ui->m_faultLedTps->setOffColor2(QColor(90, 0, 2));
+    m_ui->m_faultLedTps->setDisabled(true);
+    m_ui->m_faultLedTpsSupply->setOnColor1(QColor(255, 0, 0));
+    m_ui->m_faultLedTpsSupply->setOnColor2(QColor(176, 0, 2));
+    m_ui->m_faultLedTpsSupply->setOffColor1(QColor(20, 0, 0));
+    m_ui->m_faultLedTpsSupply->setOffColor2(QColor(90, 0, 2));
+    m_ui->m_faultLedTpsSupply->setDisabled(true);
 
     m_ui->m_logFileNameBox->setText(QDateTime::currentDateTime().toString("yyyy-MM-dd_hh.mm.ss"));
 
-    SpeedUnits speedUnit = m_options->getSpeedUnits();
+    PressureUnits pressureUnit = m_options->getPressureUnits();
 
-    m_ui->m_speedo->setMinimum(0.0);
-    m_ui->m_speedo->setMaximum((m_options->getSpeedUnits() == MPH) ? speedometerMaxMPH : speedometerMaxKPH);
-    m_ui->m_speedo->setSuffix(m_speedUnitSuffix->value(speedUnit));
-    m_ui->m_speedo->setNominal(1000.0);
-    m_ui->m_speedo->setCritical(1000.0);
+    m_ui->m_mapGauge->setMinimum(0.0);
+    m_ui->m_mapGauge->setMaximum((pressureUnit == Psi) ? mapGaugeMaxPsi : mapGaugeMaxKPa);
+    m_ui->m_mapGauge->setSuffix(m_pressureUnitSuffix->value(pressureUnit));
+    m_ui->m_mapGauge->setNominal(1000.0);
+    m_ui->m_mapGauge->setCritical(1000.0);
 
     m_ui->m_revCounter->setMinimum(0.0);
     m_ui->m_revCounter->setMaximum(8000);
@@ -245,25 +275,20 @@ void MainWindow::onExitSelected()
     this->close();
 }
 
-/**
- * Converts speed in miles per hour to the desired units.
- * @param speedMph Speed in miles per hour
- * @return Speed in the desired units
- */
-int MainWindow::convertSpeed(int speedMph)
+int MainWindow::convertPressure(int pressurePsi)
 {
-    double speed = speedMph;
+    double pressure = pressurePsi;
 
-    switch (m_options->getSpeedUnits())
+    switch (m_options->getPressureUnits())
     {
-    case KPH:
-        speed *= 1.609344;
+    case KPa:
+        pressure *= 6.872673979;
         break;
     default:
         break;
     }
 
-    return (int)speed;
+    return (int)pressure;
 }
 
 /**
@@ -288,7 +313,6 @@ int MainWindow::convertTemperature(int tempF)
     return (int)temp;
 }
 
-
 /**
  * Updates the gauges and indicators with the latest data available from
  * the ECU.
@@ -297,23 +321,18 @@ void MainWindow::onDataReady()
 {
     mems_data data = m_mems->getData();
 
-    //m_ui->m_milLed->setChecked(m_mems->isMILOn());
-
-    m_ui->m_throttleBar->setValue((float)data.throttle_pot_voltage / 5.10 * 100);
-    m_ui->m_mapValue->setText(QString::number(data.map_psi));
+    m_ui->m_throttleBar->setValue((float)data.throttle_pot_voltage / 5.00 * 100);
     m_ui->m_idleBypassPosBar->setValue((float)data.iac_position / 255.0 * 100);
     m_ui->m_revCounter->setValue(data.engine_rpm);
+    m_ui->m_mapGauge->setValue(convertPressure(data.map_psi));
     m_ui->m_waterTempGauge->setValue(convertTemperature(data.coolant_temp_f));
     m_ui->m_airTempGauge->setValue(convertTemperature(data.intake_air_temp_f));
     m_ui->m_voltage->setText(QString::number(data.battery_voltage, 'f', 1) + "VDC");
 
-    /*
-        int targetIdleSpeedRPM = m_mems->getTargetIdleSpeed();
-        if (targetIdleSpeedRPM > 0)
-            m_ui->m_targetIdle->setText(QString::number(targetIdleSpeedRPM));
-        else
-            m_ui->m_targetIdle->setText("");
-    */
+    m_ui->m_faultLedCTS->setEnabled     (data.fault_codes & 0x01);
+    m_ui->m_faultLedATS->setEnabled     (data.fault_codes & 0x02);
+    m_ui->m_faultLedFuelPump->setEnabled(data.fault_codes & 0x04);
+    m_ui->m_faultLedTps->setEnabled     (data.fault_codes & 0x08);
 
     m_ui->m_idleModeLed->setChecked(data.idle_switch);
 
@@ -348,17 +367,17 @@ void MainWindow::onEditOptionsClicked()
     if (m_options->exec() == QDialog::Accepted)
     {
         // update the speedo appropriately
-        SpeedUnits speedUnits = m_options->getSpeedUnits();
-        if (speedUnits == MPH)
+        PressureUnits pressureUnits = m_options->getPressureUnits();
+        if (pressureUnits == Psi)
         {
-            m_ui->m_speedo->setMaximum(speedometerMaxMPH);
+            m_ui->m_mapGauge->setMaximum(mapGaugeMaxPsi);
         }
         else
         {
-            m_ui->m_speedo->setMaximum(speedometerMaxKPH);
+            m_ui->m_mapGauge->setMaximum(mapGaugeMaxKPa);
         }
-        m_ui->m_speedo->setSuffix(m_speedUnitSuffix->value(speedUnits));
-        m_ui->m_speedo->repaint();
+        m_ui->m_mapGauge->setSuffix(m_pressureUnitSuffix->value(pressureUnits));
+        m_ui->m_mapGauge->repaint();
 
         TemperatureUnits tempUnits = m_options->getTemperatureUnits();
         QString tempUnitStr = m_tempUnitSuffix->value(tempUnits);
@@ -424,8 +443,13 @@ void MainWindow::onConnect()
     m_ui->m_disconnectButton->setEnabled(true);
     m_ui->m_commsGoodLed->setChecked(false);
     m_ui->m_commsBadLed->setChecked(false);
-    m_ui->m_fuelPumpOneshotButton->setEnabled(true);
-    m_ui->m_fuelPumpContinuousButton->setEnabled(true);
+
+    m_ui->m_testACRelayButton->setEnabled(true);
+    m_ui->m_testFuelInjectorButton->setEnabled(true);
+    m_ui->m_testFuelPumpRelayButton->setEnabled(true);
+    m_ui->m_testIdleBypassButton->setEnabled(true);
+    m_ui->m_testIgnitionCoilButton->setEnabled(true);
+    m_ui->m_testPTCRelayButton->setEnabled(true);
 }
 
 /**
@@ -436,34 +460,26 @@ void MainWindow::onDisconnect()
 {
     m_ui->m_connectButton->setEnabled(true);
     m_ui->m_disconnectButton->setEnabled(false);
-    m_ui->m_milLed->setChecked(false);
     m_ui->m_commsGoodLed->setChecked(false);
     m_ui->m_commsBadLed->setChecked(false);
-    m_ui->m_fuelPumpOneshotButton->setEnabled(false);
-    m_ui->m_fuelPumpContinuousButton->setEnabled(false);
     m_ui->m_tuneRevNumberLabel->setText("Tune:");
-    m_ui->m_identLabel->setText("Ident:");
-    m_ui->m_checksumFixerLabel->setText("Checksum fixer:");
 
-    m_ui->m_speedo->setValue(0.0);
+    m_ui->m_mapGauge->setValue(0.0);
     m_ui->m_revCounter->setValue(0.0);
     m_ui->m_waterTempGauge->setValue(m_ui->m_waterTempGauge->minimum());
     m_ui->m_airTempGauge->setValue(m_ui->m_airTempGauge->minimum());
     m_ui->m_throttleBar->setValue(0);
-    m_ui->m_mapValue->setText("");
     m_ui->m_idleBypassPosBar->setValue(0);
     m_ui->m_idleModeLed->setChecked(false);
-    m_ui->m_targetIdle->setText("");
     m_ui->m_voltage->setText("");
     m_ui->m_gear->setText("");
-    m_ui->m_fuelPumpRelayStateLed->setChecked(false);
-    m_ui->m_oddFuelTrimBar->setValue(0);
-    if (m_ui->m_oddFuelTrimBar->isVisible())
-        m_ui->m_oddFuelTrimBarLabel->setText("+0%");
-    else
-        m_ui->m_oddFuelTrimBarLabel->setText("0.0VDC");
 
-    m_ui->m_oddFuelTrimBar->repaint();
+    m_ui->m_testACRelayButton->setEnabled(false);
+    m_ui->m_testFuelInjectorButton->setEnabled(false);
+    m_ui->m_testFuelPumpRelayButton->setEnabled(false);
+    m_ui->m_testIdleBypassButton->setEnabled(false);
+    m_ui->m_testIgnitionCoilButton->setEnabled(false);
+    m_ui->m_testPTCRelayButton->setEnabled(false);
 }
 
 /**
@@ -575,34 +591,41 @@ void MainWindow::onNotConnected()
         QMessageBox::Ok);
 }
 
-/**
- * Starts a timer that periodically re-sends the signal to run the fuel
- * pump, thus keeping the pump running continuously.
- */
-void MainWindow::onFuelPumpContinuous()
+void MainWindow::onFuelPumpTestTimeout()
 {
-    if (m_ui->m_fuelPumpContinuousButton->isChecked())
-    {
-        emit requestFuelPumpOn();
-        m_ui->m_fuelPumpOneshotButton->setEnabled(false);
-    }
-    else
-    {
-        emit requestFuelPumpOff();
-        m_ui->m_fuelPumpOneshotButton->setEnabled(true);
-    }
+    emit fuelPumpControl(false);
+    m_ui->m_testFuelPumpRelayButton->setEnabled(true);
 }
 
-void MainWindow::onFuelPumpOneshot()
+void MainWindow::onACRelayTestTimeout()
 {
-    emit requestFuelPumpOn();
-    m_fuelPumpCycleTimer->start(2000);
+    emit acRelayControl(false);
+    m_ui->m_testACRelayButton->setEnabled(true);
 }
 
-/**
- * Displays the idle-air-control dialog.
- */
-void MainWindow::onIdleAirControlClicked()
+void MainWindow::onPTCRelayTestTimeout()
 {
-    m_iacDialog->show();
+    emit ptcRelayControl(false);
+    m_ui->m_testPTCRelayButton->setEnabled(true);
+}
+
+void MainWindow::onTestACRelayClicked()
+{
+    m_ui->m_testACRelayButton->setEnabled(false);
+    emit acRelayControl(true);
+    m_acRelayTestTimer->start();
+}
+
+void MainWindow::onTestFuelPumpRelayClicked()
+{
+    m_ui->m_testFuelPumpRelayButton->setEnabled(false);
+    emit fuelPumpControl(true);
+    m_fuelPumpTestTimer->start();
+}
+
+void MainWindow::onTestPTCRelayClicked()
+{
+    m_ui->m_testPTCRelayButton->setEnabled(false);
+    emit ptcRelayControl(true);
+    m_ptcRelayTestTimer->start();
 }

@@ -9,7 +9,7 @@ OptionsDialog::OptionsDialog(QString title, QWidget *parent) : QDialog(parent),
     m_serialDeviceChanged(false),
     m_settingsGroupName("Settings"),
     m_settingSerialDev("SerialDevice"),
-    m_settingSpeedUnits("SpeedUnits"),
+    m_settingPressureUnits("PressureUnits"),
     m_settingTemperatureUnits("TemperatureUnits")
 {
     this->setWindowTitle(title);
@@ -29,8 +29,8 @@ void OptionsDialog::setupWidgets()
     m_serialDeviceLabel = new QLabel("Serial device name:", this);
     m_serialDeviceBox = new QComboBox(this);
 
-    m_speedUnitsLabel = new QLabel("Speed units:", this);
-    m_speedUnitsBox = new QComboBox(this);
+    m_pressureUnitsLabel = new QLabel("Pressure units:", this);
+    m_pressureUnitsBox = new QComboBox(this);
 
     m_temperatureUnitsLabel = new QLabel("Temperature units:", this);
     m_temperatureUnitsBox = new QComboBox(this);
@@ -47,11 +47,10 @@ void OptionsDialog::setupWidgets()
     m_serialDeviceBox->setEditable(true);
     m_serialDeviceBox->setMinimumWidth(150);
 
-    m_speedUnitsBox->setEditable(false);
-    m_speedUnitsBox->addItem("MPH");
-    m_speedUnitsBox->addItem("ft/s");
-    m_speedUnitsBox->addItem("km/h");
-    m_speedUnitsBox->setCurrentIndex((int)m_speedUnits);
+    m_pressureUnitsBox->setEditable(false);
+    m_pressureUnitsBox->addItem("psi");
+    m_pressureUnitsBox->addItem("kPa");
+    m_pressureUnitsBox->setCurrentIndex((int)m_pressureUnits);
 
     m_temperatureUnitsBox->setEditable(false);
     m_temperatureUnitsBox->addItem("Fahrenheit");
@@ -61,8 +60,8 @@ void OptionsDialog::setupWidgets()
     m_grid->addWidget(m_serialDeviceLabel, row, 0);
     m_grid->addWidget(m_serialDeviceBox, row++, 1);
 
-    m_grid->addWidget(m_speedUnitsLabel, row, 0);
-    m_grid->addWidget(m_speedUnitsBox, row++, 1);
+    m_grid->addWidget(m_pressureUnitsLabel, row, 0);
+    m_grid->addWidget(m_pressureUnitsBox, row++, 1);
 
     m_grid->addWidget(m_temperatureUnitsLabel, row, 0);
     m_grid->addWidget(m_temperatureUnitsBox, row++, 1);
@@ -97,7 +96,7 @@ void OptionsDialog::accept()
     }
 
     m_tempUnits = (TemperatureUnits)(m_temperatureUnitsBox->currentIndex());
-    m_speedUnits = (SpeedUnits)(m_speedUnitsBox->currentIndex());
+    m_pressureUnits = (PressureUnits)(m_pressureUnitsBox->currentIndex());
 
     writeSettings();
     done(QDialog::Accepted);
@@ -108,11 +107,11 @@ void OptionsDialog::accept()
  */
 void OptionsDialog::readSettings()
 {
-    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "RoverGauge");
+    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "MEMSGauge");
 
     settings.beginGroup(m_settingsGroupName);
     m_serialDeviceName = settings.value(m_settingSerialDev, "").toString();
-    m_speedUnits = (SpeedUnits)(settings.value(m_settingSpeedUnits, MPH).toInt());
+    m_pressureUnits = (PressureUnits)(settings.value(m_settingPressureUnits, MPH).toInt());
     m_tempUnits = (TemperatureUnits)(settings.value(m_settingTemperatureUnits, Fahrenheit).toInt());
 
     settings.endGroup();
@@ -123,11 +122,11 @@ void OptionsDialog::readSettings()
  */
 void OptionsDialog::writeSettings()
 {
-    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "RoverGauge");
+    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "MEMSGauge");
 
     settings.beginGroup(m_settingsGroupName);
     settings.setValue(m_settingSerialDev, m_serialDeviceName);
-    settings.setValue(m_settingSpeedUnits, m_speedUnits);
+    settings.setValue(m_settingPressureUnits, m_pressureUnits);
     settings.setValue(m_settingTemperatureUnits, m_tempUnits);
 
     settings.endGroup();

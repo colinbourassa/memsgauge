@@ -58,12 +58,10 @@ add_definitions ("-DMEMSGAUGE_VER_MAJOR=${MEMSGAUGE_VER_MAJOR}"
 add_executable (memsgauge main.cpp
                           memsinterface.cpp
                           helpviewer.cpp
-                          idleaircontroldialog.cpp
                           logger.cpp
                           serialdevenumerator.cpp
                           fueltrimbar.cpp
                           mainwindow.cpp
-                          faultcodedialog.cpp
                           aboutbox.cpp
                           optionsdialog.cpp
                           qledindicator/qledindicator.cpp
