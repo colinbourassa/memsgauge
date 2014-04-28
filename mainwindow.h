@@ -33,13 +33,14 @@ public:
 
 public slots:
     void onDataReady();
-    void onConnect(uint8_t* id);
+    void onConnect();
     void onDisconnect();
     void onReadError();
     void onReadSuccess();
     void onFailedToConnect(QString dev);
-    void onInterfaceReady();
+    void onInterfaceThreadReady();
     void onNotConnected();
+    void onEcuIdReceived(uint8_t* id);
 
 signals:
     void requestToStartPolling();

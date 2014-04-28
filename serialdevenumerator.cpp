@@ -18,7 +18,7 @@ SerialDevEnumerator::SerialDevEnumerator()
 
 /**
  * Queries the OS / device filesystem for the list of serial devices likely
- * to be the one that is connected to the 14CUX ECU.
+ * to be the one that is connected to the ECU.
  * @return List of device names
  */
 QStringList SerialDevEnumerator::getSerialDevList(QString savedDevName)

@@ -44,7 +44,7 @@ public slots:
 
 signals:
     void dataReady();
-    void connected(uint8_t* id_response_buffer);
+    void connected();
     void disconnected();
     void readError();
     void readSuccess();
@@ -52,8 +52,9 @@ signals:
     void faultCodesClearSuccess();
     void faultCodesClearFailure();
     void failedToConnect(QString dev);
-    void interfaceReadyForPolling();
+    void interfaceThreadReady();
     void notConnected();
+    void gotEcuId(uint8_t* id_buffer);
 
 private:
     mems_data m_data;
@@ -62,6 +63,7 @@ private:
     bool m_stopPolling;
     bool m_shutdownThread;
     bool m_initComplete;
+    bool m_serviceLoopRunning;
     uint8_t m_d0_response_buffer[4];
 
     void runServiceLoop();

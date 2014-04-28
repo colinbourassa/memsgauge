@@ -12,9 +12,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-/**
- * Constructor; sets up main UI
- */
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
       m_ui(new Ui::MainWindow),
@@ -51,13 +48,14 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_ptcRelayTestTimer, SIGNAL(timeout()), this, SLOT(onPTCRelayTestTimeout()));
 
     connect(m_mems, SIGNAL(dataReady()), this, SLOT(onDataReady()));
-    connect(m_mems, SIGNAL(connected(uint8_t*)), this, SLOT(onConnect(uint8_t*)));
+    connect(m_mems, SIGNAL(connected()), this, SLOT(onConnect()));
     connect(m_mems, SIGNAL(disconnected()), this, SLOT(onDisconnect()));
     connect(m_mems, SIGNAL(readError()), this, SLOT(onReadError()));
     connect(m_mems, SIGNAL(readSuccess()), this, SLOT(onReadSuccess()));
     connect(m_mems, SIGNAL(failedToConnect(QString)), this, SLOT(onFailedToConnect(QString)));
-    connect(m_mems, SIGNAL(interfaceReadyForPolling()), this, SLOT(onInterfaceReady()));
+    connect(m_mems, SIGNAL(interfaceThreadReady()), this, SLOT(onInterfaceThreadReady()));
     connect(m_mems, SIGNAL(notConnected()), this, SLOT(onNotConnected()));
+    connect(m_mems, SIGNAL(gotEcuId(uint8_t*)), this, SLOT(onEcuIdReceived(uint8_t*)));
     connect(this, SIGNAL(requestToStartPolling()), m_mems, SLOT(onStartPollingRequest()));
     connect(this, SIGNAL(requestThreadShutdown()), m_mems, SLOT(onShutdownThreadRequest()));
 
@@ -70,10 +68,6 @@ MainWindow::MainWindow(QWidget *parent)
     setupWidgets();
 }
 
-/**
- * Destructor; cleans up instance of 14CUX communications library
- *  and miscellaneous data storage
- */
 MainWindow::~MainWindow()
 {
     delete m_tempLimits;
@@ -228,7 +222,7 @@ void MainWindow::setupWidgets()
 }
 
 /**
- * Attempts to open the serial device connected to the 14CUX,
+ * Attempts to open the serial device connected to the ECU,
  * and starts updating the display with data if successful.
  */
 void MainWindow::onConnectClicked()
@@ -254,14 +248,16 @@ void MainWindow::onConnectClicked()
     }
 }
 
-/**
- * Responds to the signal from the worker thread which indicates that it's
- * ready to start polling the ECU. This routine emits the "start polling"
- * command signal.
- */
-void MainWindow::onInterfaceReady()
+void MainWindow::onInterfaceThreadReady()
 {
     emit requestToStartPolling();
+}
+
+void MainWindow::onEcuIdReceived(uint8_t *id)
+{
+    char idString[20];
+    sprintf(idString, "ECU ID: %02X %02X %02X %02X", id[0], id[1], id[2], id[3]);
+    m_ui->m_ecuIdLabel->setText(QString(idString));
 }
 
 /**
@@ -414,7 +410,7 @@ void MainWindow::onEditOptionsClicked()
         m_ui->m_waterTempGauge->repaint();
 
         // if the user changed the serial device name and/or the polling
-        // interval, stop the timer, re-connect to the 14CUX (if neccessary),
+        // interval, stop the timer, re-connect to the ECU (if neccessary),
         // and restart the timer
         if (m_options->getSerialDeviceChanged())
         {
@@ -449,23 +445,12 @@ void MainWindow::closeEvent(QCloseEvent *event)
  * Reponds to the "connect" signal from the MEMSInterface by enabling/disabling
  * the appropriate buttons and setting a message in the status bar.
  */
-void MainWindow::onConnect(uint8_t *id)
+void MainWindow::onConnect()
 {
-    char idString[20];
-    sprintf(idString, "ECU ID: %02X %02X %02X %02X", id[0], id[1], id[2], id[3]);
-
     m_ui->m_connectButton->setEnabled(false);
     m_ui->m_disconnectButton->setEnabled(true);
     m_ui->m_commsGoodLed->setChecked(false);
     m_ui->m_commsBadLed->setChecked(false);
-    m_ui->m_ecuIdLabel->setText(QString(idString));
-
-    m_ui->m_testACRelayButton->setEnabled(true);
-    m_ui->m_testFuelInjectorButton->setEnabled(true);
-    m_ui->m_testFuelPumpRelayButton->setEnabled(true);
-    m_ui->m_testIdleBypassButton->setEnabled(true);
-    m_ui->m_testIgnitionCoilButton->setEnabled(true);
-    m_ui->m_testPTCRelayButton->setEnabled(true);
 
     m_ui->m_clearFaultsButton->setEnabled(true);
 }
@@ -583,14 +568,14 @@ void MainWindow::onFailedToConnect(QString dev)
     if (dev.isEmpty() || dev.isNull())
     {
         QMessageBox::warning(this, "Error",
-            QString("Error connecting to 14CUX. No serial port name specified.\n\n") +
+            QString("Error connecting to ECU. No serial port name specified.\n\n") +
             QString("Set a serial device by selecting \"Edit Settings\" from the \"Options\" menu."),
             QMessageBox::Ok);
     }
     else
     {
         QMessageBox::warning(this, "Error",
-            "Error connecting to 14CUX. Could not open serial device: " + dev,
+            "Error connecting to ECU. Could not open serial device: " + dev,
             QMessageBox::Ok);
     }
 }

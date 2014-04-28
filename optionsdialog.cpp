@@ -84,7 +84,7 @@ void OptionsDialog::accept()
 
     // set a flag if the serial device has been changed;
     // the main application needs to know if it should
-    // reconnect to the 14CUX
+    // reconnect to the ECU
     if (m_serialDeviceName.compare(newSerialDeviceName) != 0)
     {
         m_serialDeviceName = newSerialDeviceName;

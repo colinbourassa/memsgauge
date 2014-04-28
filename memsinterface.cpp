@@ -7,7 +7,7 @@
 /**
  * Constructor. Sets the serial device and measurement units.
  * @param device Name of (or path to) the serial device used to comminucate
- *  with the 14CUX.
+ *  with the ECU.
  * @param sUnits Units to be used when expressing road speed
  * @param tUnits Units to be used when expressing coolant/fuel temperature
  */
@@ -71,19 +71,18 @@ void MEMSInterface::onIdleAirControlMovementRequest(int direction)
 }
 
 /**
- * Attempts to open the serial device that is connected to the 14CUX.
- * @return True if serial device was opened successfully; false otherwise.
+ * Attempts to open the serial device that is connected to the ECU.
+ * @return True if serial device was opened successfully and the
+ *  ECU is responding to commands; false otherwise.
  */
 bool MEMSInterface::connectToECU()
 {
     bool status = mems_connect(&m_memsinfo, m_deviceName.toStdString().c_str()) &&
                   mems_init_link(&m_memsinfo, m_d0_response_buffer);
-
     if (status)
     {
-        emit connected(m_d0_response_buffer);
+        emit gotEcuId(m_d0_response_buffer);
     }
-
     return status;
 }
 
@@ -100,9 +99,7 @@ void MEMSInterface::disconnectFromECU()
  */
 void MEMSInterface::onShutdownThreadRequest()
 {
-    // If we're currently connected, just set a flag to let the polling loop
-    // shut the thread down. Otherwise, shut it down here.
-    if (m_initComplete && mems_is_connected(&m_memsinfo))
+    if (m_serviceLoopRunning)
     {
         m_shutdownThread = true;
     }
@@ -135,7 +132,7 @@ void MEMSInterface::onParentThreadStarted()
         m_initComplete = true;
     }
 
-    emit interfaceReadyForPolling();
+    emit interfaceThreadReady();
 }
 
 /**
@@ -145,6 +142,7 @@ void MEMSInterface::onStartPollingRequest()
 {
     if (connectToECU())
     {
+        emit connected();
         m_stopPolling = false;
         m_shutdownThread = false;
         runServiceLoop();
@@ -171,6 +169,7 @@ void MEMSInterface::runServiceLoop()
 {
     bool connected = mems_is_connected(&m_memsinfo);
 
+    m_serviceLoopRunning = true;
     while (!m_stopPolling && !m_shutdownThread && connected)
     {
         if (mems_read(&m_memsinfo, &m_data))
@@ -184,6 +183,7 @@ void MEMSInterface::runServiceLoop()
         }
         QCoreApplication::processEvents();
     }
+    m_serviceLoopRunning = false;
 
     if (connected)
     {

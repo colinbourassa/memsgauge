@@ -3,7 +3,7 @@
 #include "logger.h"
 
 /**
- * Constructor. Sets the 14CUX interface class pointer as
+ * Constructor. Sets the interface class pointer as
  * well as log directory and log file extension.
  */
 Logger::Logger(MEMSInterface *memsiface) :
@@ -54,7 +54,7 @@ void Logger::closeLog()
 }
 
 /**
- * Commands the logger to query the 14CUX interface for the currently
+ * Commands the logger to query the interface for the currently
  * buffered data, and write it to the file.
  */
 void Logger::logData()
