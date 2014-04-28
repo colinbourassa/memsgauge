@@ -59,6 +59,7 @@ void Logger::closeLog()
  */
 void Logger::logData()
 {
+    // TODO
     if (m_logFile.isOpen() && (m_logFileStream.status() == QTextStream::Ok))
     {
         m_logFileStream << QDateTime::currentDateTime().toString("hh:mm:ss.zzz") << "," << endl;

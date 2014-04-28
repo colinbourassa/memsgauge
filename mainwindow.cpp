@@ -23,7 +23,8 @@ MainWindow::MainWindow(QWidget *parent)
       m_options(0),
       m_aboutBox(0),
       m_pleaseWaitBox(0),
-      m_helpViewerDialog(0)
+      m_helpViewerDialog(0),
+      m_actuatorTestsEnabled(true)
 {
     buildSpeedAndTempUnitTables();
     m_ui->setupUi(this);
@@ -50,7 +51,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_ptcRelayTestTimer, SIGNAL(timeout()), this, SLOT(onPTCRelayTestTimeout()));
 
     connect(m_mems, SIGNAL(dataReady()), this, SLOT(onDataReady()));
-    connect(m_mems, SIGNAL(connected()), this, SLOT(onConnect()));
+    connect(m_mems, SIGNAL(connected(uint8_t*)), this, SLOT(onConnect(uint8_t*)));
     connect(m_mems, SIGNAL(disconnected()), this, SLOT(onDisconnect()));
     connect(m_mems, SIGNAL(readError()), this, SLOT(onReadError()));
     connect(m_mems, SIGNAL(readSuccess()), this, SLOT(onReadSuccess()));
@@ -148,11 +149,17 @@ void MainWindow::setupWidgets()
     m_ui->m_commsBadLed->setOffColor1(QColor(20, 0, 0));
     m_ui->m_commsBadLed->setOffColor2(QColor(90, 0, 2));
     m_ui->m_commsBadLed->setDisabled(true);
-    m_ui->m_idleModeLed->setOnColor1(QColor(102, 255, 102));
-    m_ui->m_idleModeLed->setOnColor2(QColor(82, 204, 82));
-    m_ui->m_idleModeLed->setOffColor1(QColor(0, 102, 0));
-    m_ui->m_idleModeLed->setOffColor2(QColor(0, 51, 0));
-    m_ui->m_idleModeLed->setDisabled(true);   
+
+    m_ui->m_idleSwitchLed->setOnColor1(QColor(102, 255, 102));
+    m_ui->m_idleSwitchLed->setOnColor2(QColor(82, 204, 82));
+    m_ui->m_idleSwitchLed->setOffColor1(QColor(0, 102, 0));
+    m_ui->m_idleSwitchLed->setOffColor2(QColor(0, 51, 0));
+    m_ui->m_idleSwitchLed->setDisabled(true);
+    m_ui->m_neutralSwitchLed->setOnColor1(QColor(102, 255, 102));
+    m_ui->m_neutralSwitchLed->setOnColor2(QColor(82, 204, 82));
+    m_ui->m_neutralSwitchLed->setOffColor1(QColor(0, 102, 0));
+    m_ui->m_neutralSwitchLed->setOffColor2(QColor(0, 51, 0));
+    m_ui->m_neutralSwitchLed->setDisabled(true);
 
     m_ui->m_faultLedATS->setOnColor1(QColor(255, 0, 0));
     m_ui->m_faultLedATS->setOnColor2(QColor(176, 0, 2));
@@ -313,6 +320,16 @@ int MainWindow::convertTemperature(int tempF)
     return (int)temp;
 }
 
+void MainWindow::setActuatorTestsEnabled(bool enabled)
+{
+    m_ui->m_testACRelayButton->setEnabled(enabled);
+    m_ui->m_testFuelInjectorButton->setEnabled(enabled);
+    m_ui->m_testFuelPumpRelayButton->setEnabled(enabled);
+    m_ui->m_testIdleBypassButton->setEnabled(enabled);
+    m_ui->m_testIgnitionCoilButton->setEnabled(enabled);
+    m_ui->m_testPTCRelayButton->setEnabled(enabled);
+}
+
 /**
  * Updates the gauges and indicators with the latest data available from
  * the ECU.
@@ -320,6 +337,17 @@ int MainWindow::convertTemperature(int tempF)
 void MainWindow::onDataReady()
 {
     mems_data data = m_mems->getData();
+
+    if ((data.engine_rpm == 0) && !m_actuatorTestsEnabled)
+    {
+        setActuatorTestsEnabled(true);
+        m_actuatorTestsEnabled = true;
+    }
+    else if ((data.engine_rpm > 0) && m_actuatorTestsEnabled)
+    {
+        setActuatorTestsEnabled(false);
+        m_actuatorTestsEnabled = false;
+    }
 
     m_ui->m_throttleBar->setValue((float)data.throttle_pot_voltage / 5.00 * 100);
     m_ui->m_idleBypassPosBar->setValue((float)data.iac_position / 255.0 * 100);
@@ -334,26 +362,10 @@ void MainWindow::onDataReady()
     m_ui->m_faultLedFuelPump->setEnabled(data.fault_codes & 0x04);
     m_ui->m_faultLedTps->setEnabled     (data.fault_codes & 0x08);
 
-    m_ui->m_idleModeLed->setChecked(data.idle_switch);
-
-    setGearLabel(data.park_neutral_switch);
+    m_ui->m_idleSwitchLed->setChecked(data.idle_switch);
+    m_ui->m_neutralSwitchLed->setChecked(data.park_neutral_switch);
 
     m_logger->logData();
-}
-
-/**
- * Sets the label indicating the current gear selection
- */
-void MainWindow::setGearLabel(bool gearReading)
-{
-    if (gearReading)
-    {
-        m_ui->m_gear->setText("Park/Neutral");
-    }
-    else
-    {
-        m_ui->m_gear->setText("Drive/Reverse");
-    }
 }
 
 /**
@@ -437,12 +449,16 @@ void MainWindow::closeEvent(QCloseEvent *event)
  * Reponds to the "connect" signal from the MEMSInterface by enabling/disabling
  * the appropriate buttons and setting a message in the status bar.
  */
-void MainWindow::onConnect()
+void MainWindow::onConnect(uint8_t *id)
 {
+    char idString[20];
+    sprintf(idString, "ECU ID: %02X %02X %02X %02X", id[0], id[1], id[2], id[3]);
+
     m_ui->m_connectButton->setEnabled(false);
     m_ui->m_disconnectButton->setEnabled(true);
     m_ui->m_commsGoodLed->setChecked(false);
     m_ui->m_commsBadLed->setChecked(false);
+    m_ui->m_ecuIdLabel->setText(QString(idString));
 
     m_ui->m_testACRelayButton->setEnabled(true);
     m_ui->m_testFuelInjectorButton->setEnabled(true);
@@ -450,6 +466,8 @@ void MainWindow::onConnect()
     m_ui->m_testIdleBypassButton->setEnabled(true);
     m_ui->m_testIgnitionCoilButton->setEnabled(true);
     m_ui->m_testPTCRelayButton->setEnabled(true);
+
+    m_ui->m_clearFaultsButton->setEnabled(true);
 }
 
 /**
@@ -462,7 +480,7 @@ void MainWindow::onDisconnect()
     m_ui->m_disconnectButton->setEnabled(false);
     m_ui->m_commsGoodLed->setChecked(false);
     m_ui->m_commsBadLed->setChecked(false);
-    m_ui->m_tuneRevNumberLabel->setText("Tune:");
+    m_ui->m_ecuIdLabel->setText("ECU ID:");
 
     m_ui->m_mapGauge->setValue(0.0);
     m_ui->m_revCounter->setValue(0.0);
@@ -470,9 +488,9 @@ void MainWindow::onDisconnect()
     m_ui->m_airTempGauge->setValue(m_ui->m_airTempGauge->minimum());
     m_ui->m_throttleBar->setValue(0);
     m_ui->m_idleBypassPosBar->setValue(0);
-    m_ui->m_idleModeLed->setChecked(false);
+    m_ui->m_idleSwitchLed->setChecked(false);
+    m_ui->m_neutralSwitchLed->setChecked(false);
     m_ui->m_voltage->setText("");
-    m_ui->m_gear->setText("");
 
     m_ui->m_testACRelayButton->setEnabled(false);
     m_ui->m_testFuelInjectorButton->setEnabled(false);
@@ -480,6 +498,8 @@ void MainWindow::onDisconnect()
     m_ui->m_testIdleBypassButton->setEnabled(false);
     m_ui->m_testIgnitionCoilButton->setEnabled(false);
     m_ui->m_testPTCRelayButton->setEnabled(false);
+
+    m_ui->m_clearFaultsButton->setEnabled(false);
 }
 
 /**
@@ -564,7 +584,7 @@ void MainWindow::onFailedToConnect(QString dev)
     {
         QMessageBox::warning(this, "Error",
             QString("Error connecting to 14CUX. No serial port name specified.\n\n") +
-            QString("Set a serial device using \"Options\" --> \"Edit Settings\""),
+            QString("Set a serial device by selecting \"Edit Settings\" from the \"Options\" menu."),
             QMessageBox::Ok);
     }
     else

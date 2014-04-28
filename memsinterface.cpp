@@ -19,6 +19,7 @@ MEMSInterface::MEMSInterface(QString device, QObject *parent) :
     m_initComplete(false)
 { 
     memset(&m_data, 0, sizeof(mems_data));
+    memset(m_d0_response_buffer, 0, 4);
 }
 
 /**
@@ -75,11 +76,12 @@ void MEMSInterface::onIdleAirControlMovementRequest(int direction)
  */
 bool MEMSInterface::connectToECU()
 {
-    bool status = mems_connect(&m_memsinfo, m_deviceName.toStdString().c_str());
+    bool status = mems_connect(&m_memsinfo, m_deviceName.toStdString().c_str()) &&
+                  mems_init_link(&m_memsinfo, m_d0_response_buffer);
 
     if (status)
     {
-        emit connected();
+        emit connected(m_d0_response_buffer);
     }
 
     return status;

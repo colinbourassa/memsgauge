@@ -33,7 +33,7 @@ public:
 
 public slots:
     void onDataReady();
-    void onConnect();
+    void onConnect(uint8_t* id);
     void onDisconnect();
     void onReadError();
     void onReadSuccess();
@@ -73,6 +73,8 @@ private:
     static const float mapGaugeMaxPsi = 20.0;
     static const float mapGaugeMaxKPa = 160.0;
 
+    bool m_actuatorTestsEnabled;
+
     QHash<PressureUnits,QString> *m_pressureUnitSuffix;
     QHash<TemperatureUnits,QString> *m_tempUnitSuffix;
     QHash<TemperatureUnits,QPair<int,int> > *m_tempRange;
@@ -80,7 +82,6 @@ private:
 
     void buildSpeedAndTempUnitTables();
     void setupWidgets();
-    void setGearLabel(bool gearReading);    
     int convertPressure(int pressurePsi);
     int convertTemperature(int tempF);
 
@@ -101,6 +102,8 @@ private slots:
     void onFuelPumpTestTimeout();
     void onACRelayTestTimeout();
     void onPTCRelayTestTimeout();
+
+    void setActuatorTestsEnabled(bool enabled);
 };
 
 #endif // MAINWINDOW_H
