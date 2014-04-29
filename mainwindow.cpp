@@ -21,7 +21,7 @@ MainWindow::MainWindow(QWidget *parent)
       m_aboutBox(0),
       m_pleaseWaitBox(0),
       m_helpViewerDialog(0),
-      m_actuatorTestsEnabled(true)
+      m_actuatorTestsEnabled(false)
 {
     buildSpeedAndTempUnitTables();
     m_ui->setupUi(this);
@@ -324,6 +324,7 @@ void MainWindow::setActuatorTestsEnabled(bool enabled)
     m_ui->m_testIdleBypassButton->setEnabled(enabled);
     m_ui->m_testIgnitionCoilButton->setEnabled(enabled);
     m_ui->m_testPTCRelayButton->setEnabled(enabled);
+    m_actuatorTestsEnabled = enabled;
 }
 
 /**
@@ -337,12 +338,10 @@ void MainWindow::onDataReady()
     if ((data.engine_rpm == 0) && !m_actuatorTestsEnabled)
     {
         setActuatorTestsEnabled(true);
-        m_actuatorTestsEnabled = true;
     }
     else if ((data.engine_rpm > 0) && m_actuatorTestsEnabled)
     {
         setActuatorTestsEnabled(false);
-        m_actuatorTestsEnabled = false;
     }
 
     m_ui->m_throttleBar->setValue((float)data.throttle_pot_voltage / 5.00 * 100);
@@ -477,12 +476,7 @@ void MainWindow::onDisconnect()
     m_ui->m_neutralSwitchLed->setChecked(false);
     m_ui->m_voltage->setText("");
 
-    m_ui->m_testACRelayButton->setEnabled(false);
-    m_ui->m_testFuelInjectorButton->setEnabled(false);
-    m_ui->m_testFuelPumpRelayButton->setEnabled(false);
-    m_ui->m_testIdleBypassButton->setEnabled(false);
-    m_ui->m_testIgnitionCoilButton->setEnabled(false);
-    m_ui->m_testPTCRelayButton->setEnabled(false);
+    setActuatorTestsEnabled(false);
 
     m_ui->m_clearFaultsButton->setEnabled(false);
 }
