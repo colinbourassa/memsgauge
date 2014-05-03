@@ -35,12 +35,12 @@ public slots:
     void onStartPollingRequest();
     void onShutdownThreadRequest();
 
-    void onFuelPumpControl(bool state);
-    void onPTCRelayControl(bool state);
-    void onACRelayControl(bool state);
+    void onFuelPumpTest();
+    void onPTCRelayTest();
+    void onACRelayTest();
     void onIgnitionCoilTest();
     void onFuelInjectorTest();
-    void onIdleAirControlMovementRequest(int direction);
+    void onIdleAirControlMovementRequest(int desiredPos);
 
 signals:
     void dataReady();
@@ -55,6 +55,11 @@ signals:
     void interfaceThreadReady();
     void notConnected();
     void gotEcuId(uint8_t* id_buffer);
+    void errorSendingCommand();
+    void fuelPumpTestComplete();
+    void ptcRelayTestComplete();
+    void acRelayTestComplete();
+    void moveIACComplete();
 
 private:
     mems_data m_data;
@@ -68,6 +73,7 @@ private:
 
     void runServiceLoop();
     bool connectToECU();
+    bool actuatorOnOffDelayTest(actuator_cmd onCmd, actuator_cmd offCmd);
 };
 
 #endif // CUXINTERFACE_H

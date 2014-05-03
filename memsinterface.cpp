@@ -8,8 +8,6 @@
  * Constructor. Sets the serial device and measurement units.
  * @param device Name of (or path to) the serial device used to comminucate
  *  with the ECU.
- * @param sUnits Units to be used when expressing road speed
- * @param tUnits Units to be used when expressing coolant/fuel temperature
  */
 MEMSInterface::MEMSInterface(QString device, QObject *parent) :
     QObject(parent),
@@ -53,21 +51,22 @@ void MEMSInterface::onFaultCodesClearRequested()
 
 /**
  * Responds to a signal requesting that the idle air control valve be moved.
- * @param direction Direction of travel for the idle air control valve;
- *  0 to open and 1 to close
- * @param steps Number of steps to move the valve in the specified direction
  */
-void MEMSInterface::onIdleAirControlMovementRequest(int direction)
+void MEMSInterface::onIdleAirControlMovementRequest(int desiredPos)
 {
-    uint8_t new_pos = 0;
     if (m_initComplete && mems_is_connected(&m_memsinfo))
     {
-        mems_move_idle_bypass_motor(&m_memsinfo, (bool)direction, &new_pos);
+        if (!mems_move_iac(&m_memsinfo, desiredPos))
+        {
+            emit errorSendingCommand();
+        }
     }
     else
     {
         emit notConnected();
     }
+
+    emit moveIACComplete();
 }
 
 /**
@@ -197,35 +196,60 @@ void MEMSInterface::runServiceLoop()
     }
 }
 
-void MEMSInterface::onFuelPumpControl(bool state)
+bool MEMSInterface::actuatorOnOffDelayTest(actuator_cmd onCmd, actuator_cmd offCmd)
 {
+    bool status = false;
+
     if (m_initComplete && mems_is_connected(&m_memsinfo))
     {
-        mems_fuel_pump_control(&m_memsinfo, state);
+        if (mems_test_actuator(&m_memsinfo, onCmd, NULL))
+        {
+            QThread::sleep(2);
+            if (mems_test_actuator(&m_memsinfo, offCmd, NULL))
+            {
+                status = true;
+            }
+        }
+
+        if (!status)
+        {
+            emit errorSendingCommand();
+        }
     }
+    else
+    {
+        emit notConnected();
+    }
+
+    return status;
 }
 
-void MEMSInterface::onPTCRelayControl(bool state)
+void MEMSInterface::onFuelPumpTest()
 {
-    if (m_initComplete && mems_is_connected(&m_memsinfo))
-    {
-        mems_ptc_relay_control(&m_memsinfo, state);
-    }
+    actuatorOnOffDelayTest(MEMS_FuelPumpOn, MEMS_FuelPumpOff);
+    emit fuelPumpTestComplete();
 }
 
-void MEMSInterface::onACRelayControl(bool state)
+void MEMSInterface::onPTCRelayTest()
 {
-    if (m_initComplete && mems_is_connected(&m_memsinfo))
-    {
-        mems_ac_relay_control(&m_memsinfo, state);
-    }
+    actuatorOnOffDelayTest(MEMS_PTCRelayOn, MEMS_PTCRelayOff);
+    emit ptcRelayTestComplete();
+}
+
+void MEMSInterface::onACRelayTest()
+{
+    actuatorOnOffDelayTest(MEMS_ACRelayOn, MEMS_ACRelayOff);
+    emit acRelayTestComplete();
 }
 
 void MEMSInterface::onIgnitionCoilTest()
 {
     if (m_initComplete && mems_is_connected(&m_memsinfo))
     {
-        mems_test_coil(&m_memsinfo);
+        if (!mems_test_actuator(&m_memsinfo, MEMS_FireCoil, NULL))
+        {
+            emit errorSendingCommand();
+        }
     }
 }
 
@@ -233,6 +257,9 @@ void MEMSInterface::onFuelInjectorTest()
 {
     if (m_initComplete && mems_is_connected(&m_memsinfo))
     {
-        mems_test_injectors(&m_memsinfo);
+        if (!mems_test_actuator(&m_memsinfo, MEMS_TestInjectors, NULL))
+        {
+            emit errorSendingCommand();
+        }
     }
 }

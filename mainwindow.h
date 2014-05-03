@@ -41,26 +41,28 @@ public slots:
     void onInterfaceThreadReady();
     void onNotConnected();
     void onEcuIdReceived(uint8_t* id);
+    void onFuelPumpTestComplete();
+    void onACRelayTestComplete();
+    void onPTCRelayTestComplete();
+    void onMoveIACComplete();
+    void onCommandError();
 
 signals:
     void requestToStartPolling();
     void requestThreadShutdown();
 
-    void fuelPumpControl(bool);
-    void ptcRelayControl(bool);
-    void acRelayControl(bool);
+    void fuelPumpTest();
+    void ptcRelayTest();
+    void acRelayTest();
     void injectorTest();
     void coilTest();
+    void moveIAC(int desiredPos);
 
 protected:
     void closeEvent(QCloseEvent *event);
 
 private:
     Ui::MainWindow *m_ui;
-
-    QTimer *m_fuelPumpTestTimer;
-    QTimer *m_acRelayTestTimer;
-    QTimer *m_ptcRelayTestTimer;
 
     QThread *m_memsThread;
     MEMSInterface *m_mems;
@@ -95,14 +97,11 @@ private slots:
     void onDisconnectClicked();
     void onStartLogging();
     void onStopLogging();
-
+    void onIACSliderMoved(int newPos);
+    void onMoveIACClicked();
     void onTestFuelPumpRelayClicked();
     void onTestACRelayClicked();
-    void onTestPTCRelayClicked();
-
-    void onFuelPumpTestTimeout();
-    void onACRelayTestTimeout();
-    void onPTCRelayTestTimeout();
+    void onTestPTCRelayClicked();    
 
     void setActuatorTestsEnabled(bool enabled);
 };

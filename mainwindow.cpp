@@ -31,22 +31,6 @@ MainWindow::MainWindow(QWidget *parent)
     m_mems = new MEMSInterface(m_options->getSerialDeviceName());
     m_logger = new Logger(m_mems);
 
-    m_fuelPumpTestTimer = new QTimer(this);
-    m_fuelPumpTestTimer->setInterval(2000);
-    m_fuelPumpTestTimer->setSingleShot(true);
-
-    m_acRelayTestTimer = new QTimer(this);
-    m_acRelayTestTimer->setInterval(2000);
-    m_acRelayTestTimer->setSingleShot(true);
-
-    m_ptcRelayTestTimer = new QTimer(this);
-    m_ptcRelayTestTimer->setInterval(2000);
-    m_ptcRelayTestTimer->setSingleShot(true);
-
-    connect(m_fuelPumpTestTimer, SIGNAL(timeout()), this, SLOT(onFuelPumpTestTimeout()));
-    connect(m_acRelayTestTimer,  SIGNAL(timeout()), this, SLOT(onACRelayTestTimeout()));
-    connect(m_ptcRelayTestTimer, SIGNAL(timeout()), this, SLOT(onPTCRelayTestTimeout()));
-
     connect(m_mems, SIGNAL(dataReady()), this, SLOT(onDataReady()));
     connect(m_mems, SIGNAL(connected()), this, SLOT(onConnect()));
     connect(m_mems, SIGNAL(disconnected()), this, SLOT(onDisconnect()));
@@ -56,12 +40,15 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_mems, SIGNAL(interfaceThreadReady()), this, SLOT(onInterfaceThreadReady()));
     connect(m_mems, SIGNAL(notConnected()), this, SLOT(onNotConnected()));
     connect(m_mems, SIGNAL(gotEcuId(uint8_t*)), this, SLOT(onEcuIdReceived(uint8_t*)));
+    connect(m_mems, SIGNAL(errorSendingCommand()), this, SLOT(onCommandError()));
+
+    connect(m_mems, SIGNAL(fuelPumpTestComplete()), this, SLOT(onFuelPumpTestComplete()));
+    connect(m_mems, SIGNAL(acRelayTestComplete()), this, SLOT(onACRelayTestComplete()));
+    connect(m_mems, SIGNAL(ptcRelayTestComplete()), this, SLOT(onPTCRelayTestComplete()));
+    connect(m_mems, SIGNAL(moveIACComplete()), this, SLOT(onMoveIACComplete()));
+
     connect(this, SIGNAL(requestToStartPolling()), m_mems, SLOT(onStartPollingRequest()));
     connect(this, SIGNAL(requestThreadShutdown()), m_mems, SLOT(onShutdownThreadRequest()));
-
-    connect(this, SIGNAL(acRelayControl(bool)), m_mems, SLOT(onACRelayControl(bool)));
-    connect(this, SIGNAL(fuelPumpControl(bool)), m_mems, SLOT(onFuelPumpControl(bool)));
-    connect(this, SIGNAL(ptcRelayControl(bool)), m_mems, SLOT(onPTCRelayControl(bool)));
 
     setWindowIcon(QIcon(":/icons/key.png"));
 
@@ -131,6 +118,8 @@ void MainWindow::setupWidgets()
     connect(m_ui->m_testPTCRelayButton,      SIGNAL(clicked()), this, SLOT(onTestPTCRelayClicked()));
     connect(m_ui->m_testIgnitionCoilButton,  SIGNAL(clicked()), m_mems, SLOT(onIgnitionCoilTest()));
     connect(m_ui->m_testFuelInjectorButton,  SIGNAL(clicked()), m_mems, SLOT(onFuelInjectorTest()));
+    connect(m_ui->m_moveIACButton,           SIGNAL(clicked()), this, SLOT(onMoveIACClicked()));
+    connect(m_ui->m_iacPositionSlider,       SIGNAL(sliderMoved(int)), this, SLOT(onIACSliderMoved(int)));
 
     // set the LED colors
     m_ui->m_commsGoodLed->setOnColor1(QColor(102, 255, 102));
@@ -170,21 +159,11 @@ void MainWindow::setupWidgets()
     m_ui->m_faultLedFuelPump->setOffColor1(QColor(20, 0, 0));
     m_ui->m_faultLedFuelPump->setOffColor2(QColor(90, 0, 2));
     m_ui->m_faultLedFuelPump->setDisabled(true);
-    m_ui->m_faultLedO2Heater->setOnColor1(QColor(255, 0, 0));
-    m_ui->m_faultLedO2Heater->setOnColor2(QColor(176, 0, 2));
-    m_ui->m_faultLedO2Heater->setOffColor1(QColor(20, 0, 0));
-    m_ui->m_faultLedO2Heater->setOffColor2(QColor(90, 0, 2));
-    m_ui->m_faultLedO2Heater->setDisabled(true);
     m_ui->m_faultLedTps->setOnColor1(QColor(255, 0, 0));
     m_ui->m_faultLedTps->setOnColor2(QColor(176, 0, 2));
     m_ui->m_faultLedTps->setOffColor1(QColor(20, 0, 0));
     m_ui->m_faultLedTps->setOffColor2(QColor(90, 0, 2));
     m_ui->m_faultLedTps->setDisabled(true);
-    m_ui->m_faultLedTpsSupply->setOnColor1(QColor(255, 0, 0));
-    m_ui->m_faultLedTpsSupply->setOnColor2(QColor(176, 0, 2));
-    m_ui->m_faultLedTpsSupply->setOffColor1(QColor(20, 0, 0));
-    m_ui->m_faultLedTpsSupply->setOffColor2(QColor(90, 0, 2));
-    m_ui->m_faultLedTpsSupply->setDisabled(true);
 
     m_ui->m_logFileNameBox->setText(QDateTime::currentDateTime().toString("yyyy-MM-dd_hh.mm.ss"));
 
@@ -321,7 +300,7 @@ void MainWindow::setActuatorTestsEnabled(bool enabled)
     m_ui->m_testACRelayButton->setEnabled(enabled);
     m_ui->m_testFuelInjectorButton->setEnabled(enabled);
     m_ui->m_testFuelPumpRelayButton->setEnabled(enabled);
-    m_ui->m_testIdleBypassButton->setEnabled(enabled);
+    m_ui->m_moveIACButton->setEnabled(enabled);
     m_ui->m_testIgnitionCoilButton->setEnabled(enabled);
     m_ui->m_testPTCRelayButton->setEnabled(enabled);
     m_actuatorTestsEnabled = enabled;
@@ -334,6 +313,7 @@ void MainWindow::setActuatorTestsEnabled(bool enabled)
 void MainWindow::onDataReady()
 {
     mems_data data = m_mems->getData();
+    int corrected_iac = (data.iac_position > IAC_MAXIMUM) ? IAC_MAXIMUM : data.iac_position;
 
     if ((data.engine_rpm == 0) && !m_actuatorTestsEnabled)
     {
@@ -344,8 +324,10 @@ void MainWindow::onDataReady()
         setActuatorTestsEnabled(false);
     }
 
-    m_ui->m_throttleBar->setValue((float)data.throttle_pot_voltage / 5.00 * 100);
-    m_ui->m_idleBypassPosBar->setValue((float)data.iac_position / 255.0 * 100);
+    m_ui->m_throttleBar->setValue(data.throttle_pot_voltage / 5.00 * 100);
+    m_ui->m_throttlePotVolts->setText(QString("%1 V").arg(data.throttle_pot_voltage));
+    m_ui->m_idleBypassPosBar->setValue((float)corrected_iac / (float)IAC_MAXIMUM * 100);
+    m_ui->m_iacPositionSteps->setText(QString::number(data.iac_position));
     m_ui->m_revCounter->setValue(data.engine_rpm);
     m_ui->m_mapGauge->setValue(convertPressure(data.map_psi));
     m_ui->m_waterTempGauge->setValue(convertTemperature(data.coolant_temp_f));
@@ -590,41 +572,58 @@ void MainWindow::onNotConnected()
         QMessageBox::Ok);
 }
 
-void MainWindow::onFuelPumpTestTimeout()
+void MainWindow::onFuelPumpTestComplete()
 {
-    emit fuelPumpControl(false);
     m_ui->m_testFuelPumpRelayButton->setEnabled(true);
 }
 
-void MainWindow::onACRelayTestTimeout()
+void MainWindow::onACRelayTestComplete()
 {
-    emit acRelayControl(false);
     m_ui->m_testACRelayButton->setEnabled(true);
 }
 
-void MainWindow::onPTCRelayTestTimeout()
+void MainWindow::onPTCRelayTestComplete()
 {
-    emit ptcRelayControl(false);
     m_ui->m_testPTCRelayButton->setEnabled(true);
 }
 
 void MainWindow::onTestACRelayClicked()
 {
     m_ui->m_testACRelayButton->setEnabled(false);
-    emit acRelayControl(true);
-    m_acRelayTestTimer->start();
+    emit acRelayTest();
 }
 
 void MainWindow::onTestFuelPumpRelayClicked()
 {
     m_ui->m_testFuelPumpRelayButton->setEnabled(false);
-    emit fuelPumpControl(true);
-    m_fuelPumpTestTimer->start();
+    emit fuelPumpTest();
 }
 
 void MainWindow::onTestPTCRelayClicked()
 {
     m_ui->m_testPTCRelayButton->setEnabled(false);
-    emit ptcRelayControl(true);
-    m_ptcRelayTestTimer->start();
+    emit ptcRelayTest();
+}
+
+void MainWindow::onIACSliderMoved(int newPos)
+{
+    m_ui->m_iacSetLabel->setText(QString("%1%").arg(newPos));
+}
+
+void MainWindow::onMoveIACClicked()
+{
+    m_ui->m_moveIACButton->setEnabled(false);
+    float percent = (float)m_ui->m_iacPositionSlider->value() / 100.0;
+    int desiredPos = (int)((float)IAC_MAXIMUM * percent);
+    emit moveIAC(desiredPos);
+}
+
+void MainWindow::onMoveIACComplete()
+{
+    m_ui->m_moveIACButton->setEnabled(true);
+}
+
+void MainWindow::onCommandError()
+{
+    QMessageBox::warning(this, "Error", "Error sending command." , QMessageBox::Ok);
 }
