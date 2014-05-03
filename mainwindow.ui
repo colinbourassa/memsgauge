@@ -228,69 +228,6 @@
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>10</y>
-      <width>374</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QPushButton" name="m_connectButton">
-       <property name="text">
-        <string>Connect</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="m_disconnectButton">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="text">
-        <string>Disconnect</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="Line" name="m_vline0">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="m_ecuIdLabel">
-       <property name="text">
-        <string>ECU ID:</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="Line" name="m_vline1">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="m_communicationsStatusLabel">
-       <property name="text">
-        <string>Communications:</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLedIndicator" name="m_commsGoodLed" native="true"/>
-     </item>
-     <item>
-      <widget class="QLedIndicator" name="m_commsBadLed" native="true"/>
-     </item>
-    </layout>
-   </widget>
-   <widget class="QWidget" name="layoutWidget">
-    <property name="geometry">
-     <rect>
       <x>680</x>
       <y>270</y>
       <width>178</width>
@@ -397,8 +334,8 @@
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>420</x>
-      <y>20</y>
+      <x>430</x>
+      <y>80</y>
       <width>381</width>
       <height>171</height>
      </rect>
@@ -468,32 +405,99 @@
       <widget class="QLedIndicator" name="m_neutralSwitchLed" native="true"/>
      </item>
      <item row="1" column="1">
+      <widget class="QLabel" name="m_iacPositionSteps">
+       <property name="text">
+        <string>0</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="2">
       <widget class="QProgressBar" name="m_idleBypassPosBar">
        <property name="value">
         <number>0</number>
        </property>
       </widget>
      </item>
-     <item row="0" column="1">
+     <item row="0" column="2">
       <widget class="QProgressBar" name="m_throttleBar">
        <property name="value">
         <number>0</number>
        </property>
       </widget>
      </item>
-     <item row="0" column="2">
+     <item row="0" column="1">
       <widget class="QLabel" name="m_throttlePotVolts">
        <property name="text">
         <string>0.0V</string>
        </property>
       </widget>
      </item>
-     <item row="1" column="2">
-      <widget class="QLabel" name="m_iacPositionSteps">
+    </layout>
+   </widget>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>11</x>
+      <y>10</y>
+      <width>831</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QPushButton" name="m_connectButton">
        <property name="text">
-        <string>0</string>
+        <string>Connect</string>
        </property>
       </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="m_disconnectButton">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>Disconnect</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="Line" name="m_vline0">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="m_ecuIdLabel">
+       <property name="text">
+        <string>ECU ID:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="Line" name="m_vline1">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QLabel" name="m_communicationsStatusLabel">
+         <property name="text">
+          <string>Communications:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLedIndicator" name="m_commsGoodLed" native="true"/>
+       </item>
+       <item>
+        <widget class="QLedIndicator" name="m_commsBadLed" native="true"/>
+       </item>
+      </layout>
      </item>
     </layout>
    </widget>

@@ -40,7 +40,7 @@ void MEMSInterface::onFaultCodesClearRequested()
         }
         else
         {
-            emit faultCodesClearFailure();
+            emit errorSendingCommand();
         }
     }
     else

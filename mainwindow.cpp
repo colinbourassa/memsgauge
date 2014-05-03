@@ -46,6 +46,12 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_mems, SIGNAL(acRelayTestComplete()), this, SLOT(onACRelayTestComplete()));
     connect(m_mems, SIGNAL(ptcRelayTestComplete()), this, SLOT(onPTCRelayTestComplete()));
     connect(m_mems, SIGNAL(moveIACComplete()), this, SLOT(onMoveIACComplete()));
+    connect(this, SIGNAL(moveIAC(int)), m_mems, SLOT(onIdleAirControlMovementRequest(int)));
+    connect(this, SIGNAL(fuelPumpTest()), m_mems, SLOT(onFuelPumpTest()));
+    connect(this, SIGNAL(acRelayTest()), m_mems, SLOT(onACRelayTest()));
+    connect(this, SIGNAL(ptcRelayTest()), m_mems, SLOT(onPTCRelayTest()));
+
+    connect(m_mems, SIGNAL(faultCodesClearSuccess()), this, SLOT(onFaultCodeClearComplete()));
 
     connect(this, SIGNAL(requestToStartPolling()), m_mems, SLOT(onStartPollingRequest()));
     connect(this, SIGNAL(requestThreadShutdown()), m_mems, SLOT(onShutdownThreadRequest()));
@@ -113,6 +119,7 @@ void MainWindow::setupWidgets()
     connect(m_ui->m_disconnectButton,        SIGNAL(clicked()), this, SLOT(onDisconnectClicked()));
     connect(m_ui->m_startLoggingButton,      SIGNAL(clicked()), this, SLOT(onStartLogging()));
     connect(m_ui->m_stopLoggingButton,       SIGNAL(clicked()), this, SLOT(onStopLogging()));
+    connect(m_ui->m_clearFaultsButton,       SIGNAL(clicked()), m_mems, SLOT(onFaultCodesClearRequested()));
     connect(m_ui->m_testACRelayButton,       SIGNAL(clicked()), this, SLOT(onTestACRelayClicked()));
     connect(m_ui->m_testFuelPumpRelayButton, SIGNAL(clicked()), this, SLOT(onTestFuelPumpRelayClicked()));
     connect(m_ui->m_testPTCRelayButton,      SIGNAL(clicked()), this, SLOT(onTestPTCRelayClicked()));
@@ -314,6 +321,7 @@ void MainWindow::onDataReady()
 {
     mems_data data = m_mems->getData();
     int corrected_iac = (data.iac_position > IAC_MAXIMUM) ? IAC_MAXIMUM : data.iac_position;
+    float corrected_throttle = (data.throttle_pot_voltage > 5.0) ? 5.0 : data.throttle_pot_voltage;
 
     if ((data.engine_rpm == 0) && !m_actuatorTestsEnabled)
     {
@@ -324,15 +332,15 @@ void MainWindow::onDataReady()
         setActuatorTestsEnabled(false);
     }
 
-    m_ui->m_throttleBar->setValue(data.throttle_pot_voltage / 5.00 * 100);
-    m_ui->m_throttlePotVolts->setText(QString("%1 V").arg(data.throttle_pot_voltage));
+    m_ui->m_throttleBar->setValue(corrected_throttle / 5.00 * 100);
+    m_ui->m_throttlePotVolts->setText(QString::number(data.throttle_pot_voltage, 'f', 2) + "V");
     m_ui->m_idleBypassPosBar->setValue((float)corrected_iac / (float)IAC_MAXIMUM * 100);
     m_ui->m_iacPositionSteps->setText(QString::number(data.iac_position));
     m_ui->m_revCounter->setValue(data.engine_rpm);
     m_ui->m_mapGauge->setValue(convertPressure(data.map_psi));
     m_ui->m_waterTempGauge->setValue(convertTemperature(data.coolant_temp_f));
     m_ui->m_airTempGauge->setValue(convertTemperature(data.intake_air_temp_f));
-    m_ui->m_voltage->setText(QString::number(data.battery_voltage, 'f', 1) + "VDC");
+    m_ui->m_voltage->setText(QString::number(data.battery_voltage, 'f', 1) + "V");
 
     m_ui->m_faultLedCTS->setEnabled     (data.fault_codes & 0x01);
     m_ui->m_faultLedATS->setEnabled     (data.fault_codes & 0x02);
@@ -456,7 +464,9 @@ void MainWindow::onDisconnect()
     m_ui->m_idleBypassPosBar->setValue(0);
     m_ui->m_idleSwitchLed->setChecked(false);
     m_ui->m_neutralSwitchLed->setChecked(false);
-    m_ui->m_voltage->setText("");
+    m_ui->m_throttlePotVolts->setText("0.00V");
+    m_ui->m_iacPositionSteps->setText("0");
+    m_ui->m_voltage->setText("0.0V");
 
     setActuatorTestsEnabled(false);
 
@@ -587,16 +597,16 @@ void MainWindow::onPTCRelayTestComplete()
     m_ui->m_testPTCRelayButton->setEnabled(true);
 }
 
-void MainWindow::onTestACRelayClicked()
-{
-    m_ui->m_testACRelayButton->setEnabled(false);
-    emit acRelayTest();
-}
-
 void MainWindow::onTestFuelPumpRelayClicked()
 {
     m_ui->m_testFuelPumpRelayButton->setEnabled(false);
     emit fuelPumpTest();
+}
+
+void MainWindow::onTestACRelayClicked()
+{
+    m_ui->m_testACRelayButton->setEnabled(false);
+    emit acRelayTest();
 }
 
 void MainWindow::onTestPTCRelayClicked()
@@ -613,6 +623,7 @@ void MainWindow::onIACSliderMoved(int newPos)
 void MainWindow::onMoveIACClicked()
 {
     m_ui->m_moveIACButton->setEnabled(false);
+    QApplication::setOverrideCursor(Qt::WaitCursor);
     float percent = (float)m_ui->m_iacPositionSlider->value() / 100.0;
     int desiredPos = (int)((float)IAC_MAXIMUM * percent);
     emit moveIAC(desiredPos);
@@ -620,10 +631,16 @@ void MainWindow::onMoveIACClicked()
 
 void MainWindow::onMoveIACComplete()
 {
+    QApplication::restoreOverrideCursor();
     m_ui->m_moveIACButton->setEnabled(true);
 }
 
 void MainWindow::onCommandError()
 {
-    QMessageBox::warning(this, "Error", "Error sending command." , QMessageBox::Ok);
+    QMessageBox::warning(this, "Error", "Error sending command.", QMessageBox::Ok);
+}
+
+void MainWindow::onFaultCodeClearComplete()
+{
+    QMessageBox::information(this, "Complete", "Successfully cleared fault codes.", QMessageBox::Ok);
 }

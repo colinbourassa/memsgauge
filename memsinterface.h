@@ -48,9 +48,7 @@ signals:
     void disconnected();
     void readError();
     void readSuccess();
-    void faultCodesReadFailed();
     void faultCodesClearSuccess();
-    void faultCodesClearFailure();
     void failedToConnect(QString dev);
     void interfaceThreadReady();
     void notConnected();

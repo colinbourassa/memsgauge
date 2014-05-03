@@ -46,6 +46,7 @@ public slots:
     void onPTCRelayTestComplete();
     void onMoveIACComplete();
     void onCommandError();
+    void onFaultCodeClearComplete();
 
 signals:
     void requestToStartPolling();
@@ -73,7 +74,7 @@ private:
 
     Logger *m_logger;
 
-    static const float mapGaugeMaxPsi = 20.0;
+    static const float mapGaugeMaxPsi = 16.0;
     static const float mapGaugeMaxKPa = 160.0;
 
     bool m_actuatorTestsEnabled;
