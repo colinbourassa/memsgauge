@@ -126,7 +126,6 @@ void MainWindow::setupWidgets()
     connect(m_ui->m_testIgnitionCoilButton,  SIGNAL(clicked()), m_mems, SLOT(onIgnitionCoilTest()));
     connect(m_ui->m_testFuelInjectorButton,  SIGNAL(clicked()), m_mems, SLOT(onFuelInjectorTest()));
     connect(m_ui->m_moveIACButton,           SIGNAL(clicked()), this, SLOT(onMoveIACClicked()));
-    connect(m_ui->m_iacPositionSlider,       SIGNAL(sliderMoved(int)), this, SLOT(onIACSliderMoved(int)));
 
     // set the LED colors
     m_ui->m_commsGoodLed->setOnColor1(QColor(102, 255, 102));
@@ -615,16 +614,11 @@ void MainWindow::onTestPTCRelayClicked()
     emit ptcRelayTest();
 }
 
-void MainWindow::onIACSliderMoved(int newPos)
-{
-    m_ui->m_iacSetLabel->setText(QString("%1%").arg(newPos));
-}
-
 void MainWindow::onMoveIACClicked()
 {
     m_ui->m_moveIACButton->setEnabled(false);
     QApplication::setOverrideCursor(Qt::WaitCursor);
-    float percent = (float)m_ui->m_iacPositionSlider->value() / 100.0;
+    float percent = (float)m_ui->m_iacPositionSlider->value() * 25.0 / 100.0;
     int desiredPos = (int)((float)IAC_MAXIMUM * percent);
     emit moveIAC(desiredPos);
 }

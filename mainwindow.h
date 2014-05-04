@@ -98,7 +98,6 @@ private slots:
     void onDisconnectClicked();
     void onStartLogging();
     void onStopLogging();
-    void onIACSliderMoved(int newPos);
     void onMoveIACClicked();
     void onTestFuelPumpRelayClicked();
     void onTestACRelayClicked();

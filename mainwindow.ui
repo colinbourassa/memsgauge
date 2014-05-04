@@ -228,17 +228,23 @@
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>680</x>
-      <y>270</y>
-      <width>178</width>
-      <height>207</height>
+      <x>650</x>
+      <y>250</y>
+      <width>210</width>
+      <height>256</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout">
      <item row="0" column="0">
       <widget class="QSlider" name="m_iacPositionSlider">
        <property name="maximum">
-        <number>100</number>
+        <number>4</number>
+       </property>
+       <property name="singleStep">
+        <number>1</number>
+       </property>
+       <property name="pageStep">
+        <number>1</number>
        </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -246,12 +252,8 @@
        <property name="invertedAppearance">
         <bool>false</bool>
        </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QLabel" name="m_iacSetLabel">
-       <property name="text">
-        <string>0%</string>
+       <property name="tickPosition">
+        <enum>QSlider::TicksBelow</enum>
        </property>
       </widget>
      </item>
@@ -259,13 +261,6 @@
       <widget class="Line" name="m_hline1">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="m_testActuatorLabel">
-       <property name="text">
-        <string>Test actuators:</string>
        </property>
       </widget>
      </item>
@@ -326,6 +321,13 @@
        </property>
        <property name="text">
         <string>Ignition coil</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0" colspan="2">
+      <widget class="QLabel" name="m_testActuatorLabel">
+       <property name="text">
+        <string>Test actuators:</string>
        </property>
       </widget>
      </item>
@@ -434,13 +436,13 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>11</x>
       <y>10</y>
       <width>831</width>
-      <height>24</height>
+      <height>29</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -508,7 +510,7 @@
      <x>0</x>
      <y>0</y>
      <width>869</width>
-     <height>20</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="m_fileMenu">
