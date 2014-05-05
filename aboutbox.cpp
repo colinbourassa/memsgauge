@@ -40,9 +40,7 @@ void AboutBox::setupWidgets()
     m_iconLabel = new QLabel(this);
     m_iconLabel->setPixmap(m_style->standardIcon(QStyle::SP_MessageBoxInformation).pixmap(32, 32));
 
-    m_name = new QLabel("MEMSGauge " +
-                      makeVersionString(MEMSGAUGE_VER_MAJOR, MEMSGAUGE_VER_MINOR, MEMSGAUGE_VER_PATCH),
-                      this);
+    m_name = new QLabel(PROJECTNAME + QString(" ") + makeVersionString(VER_MAJOR, VER_MINOR, VER_PATCH), this);
     QFont defaultFont = m_name->font();
     defaultFont.setPointSize(14);
     m_name->setFont(defaultFont);

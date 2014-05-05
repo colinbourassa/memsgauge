@@ -1,15 +1,20 @@
 cmake_minimum_required (VERSION 2.8.11)
-project (memsgauge)
 
-set (MEMSGAUGE_VER_MAJOR 0)
-set (MEMSGAUGE_VER_MINOR 1)
-set (MEMSGAUGE_VER_PATCH 0)
+set (PROJECTNAME "MEMSGauge")
+
+string (TOLOWER ${PROJECTNAME} PNAME)
+project (${PNAME})
+add_definitions (-DPROJECTNAME=\"${PROJECTNAME}\")
+
+set (VER_MAJOR 0)
+set (VER_MINOR 1)
+set (VER_PATCH 0)
 
 set (CMAKE_INCLUDE_CURRENT_DIR ON)
 set (CMAKE_AUTOMOC ON)
 
 set (CPACK_SOURCE_GENERATOR "TGZ" "ZIP")
-set (CPACK_SOURCE_PACKAGE_FILE_NAME "${PROJECT_NAME}-${MEMSGAUGE_VER_MAJOR}.${MEMSGAUGE_VER_MINOR}.${MEMSGAUGE_VER_PATCH}-src")
+set (CPACK_SOURCE_PACKAGE_FILE_NAME "${PROJECT_NAME}-${VER_MAJOR}.${VER_MINOR}.${VER_PATCH}-src")
 set (CPACK_SOURCE_IGNORE_FILES
       ".*~$"
       ".git"
@@ -48,14 +53,14 @@ include_directories ("${CMAKE_SOURCE_DIR}"
 
 qt5_wrap_ui (UI_SOURCE mainwindow.ui)
 message (STATUS "Generated: ${UI_SOURCE}")
-qt5_add_resources (RG_RESOURCE memsgauge_resources.qrc)
+qt5_add_resources (RG_RESOURCE resources.qrc)
 message (STATUS "Generated: ${RG_RESOURCE}")
 
-add_definitions ("-DMEMSGAUGE_VER_MAJOR=${MEMSGAUGE_VER_MAJOR}"
-                 "-DMEMSGAUGE_VER_MINOR=${MEMSGAUGE_VER_MINOR}"
-                 "-DMEMSGAUGE_VER_PATCH=${MEMSGAUGE_VER_PATCH}")
+add_definitions ("-DVER_MAJOR=${VER_MAJOR}"
+                 "-DVER_MINOR=${VER_MINOR}"
+                 "-DVER_PATCH=${VER_PATCH}")
 
-add_executable (memsgauge main.cpp
+add_executable (${PNAME} main.cpp
                           memsinterface.cpp
                           helpviewer.cpp
                           logger.cpp
@@ -84,8 +89,8 @@ if (MINGW)
   include_directories ("${LIBMEMSINJECTION_PATH}/include")
 
   message (STATUS "Defaulting installation path to: ${LIBMEMSINJECTION_PATH}")
-  set (CMAKE_INSTALL_PREFIX "$ENV{SystemDrive}/memsgauge")
-  set (EXE_FILE "${CMAKE_CURRENT_BINARY_DIR}/memsgauge.exe")
+  set (CMAKE_INSTALL_PREFIX "$ENV{SystemDrive}/${PNAME}")
+  set (EXE_FILE "${CMAKE_CURRENT_BINARY_DIR}/${PNAME}.exe")
 
 # When we call find_library() below, we're only looking for DLLs, so set the suffix list appropriately
   set (CMAKE_FIND_LIBRARY_SUFFIXES ".dll")
@@ -147,7 +152,7 @@ if (MINGW)
     message (SEND_ERROR "Could not find libmemsinjection.dll! Check that it exists in one of the directories in your PATH.")
   endif ()
 
-  target_link_libraries (memsgauge ${LIBMEMSINJECTION_DLL} Qt5::Widgets)
+  target_link_libraries (${PNAME} ${LIBMEMSINJECTION_DLL} Qt5::Widgets)
 
   # convert Unix-style newline characters into Windows-style
   file (READ "${CMAKE_SOURCE_DIR}/README" README_CONTENTS)
@@ -172,17 +177,17 @@ if (MINGW)
   set (CPACK_GENERATOR "ZIP")
   set (CPACK_PACKAGE_NAME ${PROJECT_NAME})
   set (CPACK_INCLUDE_TOPLEVEL_DIRECTORY 0)
-  set (CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${MEMSGAUGE_VER_MAJOR}.${MEMSGAUGE_VER_MINOR}.${MEMSGAUGE_VER_PATCH}-${CMAKE_SYSTEM_NAME}")
+  set (CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${VER_MAJOR}.${VER_MINOR}.${VER_PATCH}-${CMAKE_SYSTEM_NAME}")
   include (CPack)
 
 else()
   message (STATUS "Platform is not Windows/MinGW; trying Linux...")
 
-  target_link_libraries (memsgauge memsinjection Qt5::Widgets)
+  target_link_libraries (${PNAME} memsinjection Qt5::Widgets)
 
   set (CMAKE_SKIP_RPATH TRUE)
   set (CMAKE_INSTALL_PREFIX "/usr")
-  set (EXE_FILE "${CMAKE_CURRENT_BINARY_DIR}/memsgauge")
+  set (EXE_FILE "${CMAKE_CURRENT_BINARY_DIR}/${PNAME}")
 
   # set the installation destinations for the header files,
   # shared library binaries, and reference utility
@@ -192,14 +197,14 @@ else()
             GROUP_READ GROUP_EXECUTE
             WORLD_READ WORLD_EXECUTE)
 
-  install (DIRECTORY DESTINATION "share/doc/memsgauge" DIRECTORY_PERMISSIONS
+  install (DIRECTORY DESTINATION "share/doc/${PNAME}" DIRECTORY_PERMISSIONS
             OWNER_READ OWNER_EXECUTE OWNER_WRITE
             GROUP_READ GROUP_EXECUTE
             WORLD_READ WORLD_EXECUTE)
 
   install (FILES "${CMAKE_SOURCE_DIR}/README"
                  "${CMAKE_SOURCE_DIR}/LICENSE"
-           DESTINATION "share/doc/memsgauge"
+           DESTINATION "share/doc/${PNAME}"
            PERMISSIONS
             OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ)
 
@@ -212,14 +217,14 @@ else()
 
   set (CPACK_GENERATOR "DEB")
   set (CPACK_PACKAGE_NAME ${PROJECT_NAME})
-  set (CPACK_PACKAGE_VERSION_MAJOR ${MEMSGAUGE_VER_MAJOR})
-  set (CPACK_PACKAGE_VERSION_MINOR ${MEMSGAUGE_VER_MINOR})
-  set (CPACK_PACKAGE_VERSION_PATCH ${MEMSGAUGE_VER_PATCH})
+  set (CPACK_PACKAGE_VERSION_MAJOR ${VER_MAJOR})
+  set (CPACK_PACKAGE_VERSION_MINOR ${VER_MINOR})
+  set (CPACK_PACKAGE_VERSION_PATCH ${VER_PATCH})
   set (CPACK_DEBIAN_PACKAGE_MAINTAINER "Colin Bourassa <colin.bourassa@gmail.com>")
-  set (CPACK_PACKAGE_DESCRIPTION_SUMMARY "Graphical display for data read from Rover MEMS (Modular Engine Management System")
+  set (CPACK_PACKAGE_DESCRIPTION_SUMMARY "Graphical display for data read from Rover MEMS 1.6 (Modular Engine Management System")
   set (CPACK_DEBIAN_PACKAGE_SECTION "Science")
   set (CPACK_DEBIAN_PACKAGE_DEPENDS "libc6 (>= 2.13), libstdc++6 (>= 4.6.3), libmemsinjection (>= 0.1.0), libqt5core5 (>= 5.0.2), libqt5gui5 (>= 5.0.2), libqt5widgets5 (>= 5.0.2)")
-  set (CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${MEMSGAUGE_VER_MAJOR}.${MEMSGAUGE_VER_MINOR}.${MEMSGAUGE_VER_PATCH}-${CMAKE_SYSTEM_NAME}-${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}")
+  set (CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${VER_MAJOR}.${VER_MINOR}.${VER_PATCH}-${CMAKE_SYSTEM_NAME}-${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}")
   set (CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
   set (CPACK_RESOURCE_FILE_README "${CMAKE_SOURCE_DIR}/README")
 

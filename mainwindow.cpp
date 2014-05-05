@@ -25,7 +25,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     buildSpeedAndTempUnitTables();
     m_ui->setupUi(this);
-    this->setWindowTitle("MEMSGauge");
+    this->setWindowTitle(PROJECTNAME);
 
     m_options = new OptionsDialog(this->windowTitle(), this);
     m_mems = new MEMSInterface(m_options->getSerialDeviceName());

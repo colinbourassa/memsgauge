@@ -10,4 +10,4 @@ cmake_install.*
 *.cbp
 *_automoc.cpp
 ui_*.h
-qrc_*_resources.cpp
+qrc*_resources.cpp

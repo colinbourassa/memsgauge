@@ -107,7 +107,7 @@ void OptionsDialog::accept()
  */
 void OptionsDialog::readSettings()
 {
-    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "MEMSGauge");
+    QSettings settings(QSettings::IniFormat, QSettings::UserScope, PROJECTNAME);
 
     settings.beginGroup(m_settingsGroupName);
     m_serialDeviceName = settings.value(m_settingSerialDev, "").toString();
@@ -122,7 +122,7 @@ void OptionsDialog::readSettings()
  */
 void OptionsDialog::writeSettings()
 {
-    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "MEMSGauge");
+    QSettings settings(QSettings::IniFormat, QSettings::UserScope, PROJECTNAME);
 
     settings.beginGroup(m_settingsGroupName);
     settings.setValue(m_settingSerialDev, m_serialDeviceName);
