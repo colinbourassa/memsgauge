@@ -11,3 +11,4 @@ cmake_install.*
 *_automoc.cpp
 ui_*.h
 qrc*_resources.cpp
+help.html
