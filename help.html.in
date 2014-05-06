@@ -23,6 +23,12 @@
     <p>To communicate with the MEMS ECU, @PROJECTNAME@ requires a special interface cable. Information on building a cable can be found here: <a href="https://code.google.com/p/libmemsinjection/wiki/HardwareInterface">https://code.google.com/p/libmemsinjection/wiki/HardwareInterface</a></p>
     <p>To summarize: the cable must be based on a USB 5V (TTL) serial converter. The FTDI TTL-232R-5V is recommended. The required connector shell is the TE Connectivity 172201. The shell must be populated with three pins, which are TE Connectivity 170280.</p>
     <p>Looking at the face of the connector with the key (notch) on the bottom, pin 1 will be on the top. Pin numbering continues clockwise. Pin 1 must be connected to the FTDI cable's GND (black) wire. Pin 2 is connected to the FTDI RxD (yellow), and pin 3 is connected to FTDI TxD (orange). The other FTDI wires are not used, and should be cut back and insulated.</p>
+    <h3>Features</h3>
+    <p>The main display shows data from several sensors in the car, and also provides the capability of testing different actuators. The actuator tests are only available when the engine is not running. The temperature and manifold pressure gauges can be switched to different units by selecting "Edit settings" from the "Options" menu.</p>
+    <p><b>ECU ID:</b> Displays, in hexadecimal, the response from the ECU to the command 0xD0, which is sent during the initialization of the serial link. If you have any information about the meaning of this four-byte response, please send the information to the author.</p>
+    <p><b>Communications:</b> Status indicators; green when the serial link is good, red when bad.
+    <p><b>Move idle bypass motor:</b> Allows the idle air bypass motor to be moved to a new position. Testing showed that the final position of the motor is generally not exactly the same as the commanded position.</p>
+    <p><b>Test actuators:</b> For the safety of the engine, the actuator tests are only available when the engine is not running. Note that not all cars are fitted with all the actuators for which test functions are provided.</p>
 
 </body>
 </html>
