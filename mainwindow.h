@@ -14,7 +14,6 @@
 #include "memsinterface.h"
 #include "aboutbox.h"
 #include "logger.h"
-#include "fueltrimbar.h"
 #include "commonunits.h"
 #include "helpviewer.h"
 

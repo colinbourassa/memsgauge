@@ -70,7 +70,6 @@ add_executable (${PNAME} main.cpp
                           helpviewer.cpp
                           logger.cpp
                           serialdevenumerator.cpp
-                          fueltrimbar.cpp
                           mainwindow.cpp
                           aboutbox.cpp
                           optionsdialog.cpp
