@@ -89,7 +89,7 @@ if (MINGW)
   # an additional DLL dependency
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mwindows -static-libstdc++")
 
-  set (LIBMEMSINJECTION_PATH "$ENV{SystemDrive}/libmemsinjection")
+  set (LIBMEMSINJECTION_PATH "$ENV{SystemDrive}/memsinjection")
   include_directories ("${LIBMEMSINJECTION_PATH}/include")
 
   message (STATUS "Defaulting installation path to: ${LIBMEMSINJECTION_PATH}")
