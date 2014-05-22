@@ -3,6 +3,8 @@ moc_*
 memsgauge
 *.depends
 CPack*
+_CPack_Packages/
+install_manifest.txt
 CMakeCache*
 CMakeFiles/
 Makefile
@@ -12,3 +14,4 @@ cmake_install.*
 ui_*.h
 qrc*_resources.cpp
 help.html
+*.deb
