@@ -65,7 +65,6 @@ MainWindow::~MainWindow()
 {
     delete m_tempLimits;
     delete m_tempRange;
-    delete m_pressureUnitSuffix;
     delete m_tempUnitSuffix;
     delete m_aboutBox;
     delete m_options;
@@ -78,10 +77,6 @@ MainWindow::~MainWindow()
  */
 void MainWindow::buildSpeedAndTempUnitTables()
 {
-    m_pressureUnitSuffix = new QHash<PressureUnits,QString>();
-    m_pressureUnitSuffix->insert(Psi, " psi");
-    m_pressureUnitSuffix->insert(KPa, " kPa");
-
     m_tempUnitSuffix = new QHash<TemperatureUnits,QString>;
     m_tempUnitSuffix->insert(Fahrenheit, " F");
     m_tempUnitSuffix->insert(Celcius, " C");
@@ -173,11 +168,9 @@ void MainWindow::setupWidgets()
 
     m_ui->m_logFileNameBox->setText(QDateTime::currentDateTime().toString("yyyy-MM-dd_hh.mm.ss"));
 
-    PressureUnits pressureUnit = m_options->getPressureUnits();
-
     m_ui->m_mapGauge->setMinimum(0.0);
-    m_ui->m_mapGauge->setMaximum((pressureUnit == Psi) ? mapGaugeMaxPsi : mapGaugeMaxKPa);
-    m_ui->m_mapGauge->setSuffix(m_pressureUnitSuffix->value(pressureUnit));
+    m_ui->m_mapGauge->setMaximum(140.0);
+    m_ui->m_mapGauge->setSuffix("kPa");
     m_ui->m_mapGauge->setNominal(1000.0);
     m_ui->m_mapGauge->setCritical(1000.0);
 
@@ -263,22 +256,6 @@ void MainWindow::onExitSelected()
     this->close();
 }
 
-int MainWindow::convertPressure(int pressurePsi)
-{
-    double pressure = pressurePsi;
-
-    switch (m_options->getPressureUnits())
-    {
-    case KPa:
-        pressure *= 6.872673979;
-        break;
-    default:
-        break;
-    }
-
-    return (int)pressure;
-}
-
 /**
  * Converts temperature in Fahrenheit degrees to the desired units.
  * @param tempF Temperature in Fahrenheit degrees
@@ -336,7 +313,7 @@ void MainWindow::onDataReady()
     m_ui->m_idleBypassPosBar->setValue((float)corrected_iac / (float)IAC_MAXIMUM * 100);
     m_ui->m_iacPositionSteps->setText(QString::number(data.iac_position));
     m_ui->m_revCounter->setValue(data.engine_rpm);
-    m_ui->m_mapGauge->setValue(convertPressure(data.map_psi));
+    m_ui->m_mapGauge->setValue(data.map_kpa);
     m_ui->m_waterTempGauge->setValue(convertTemperature(data.coolant_temp_f));
     m_ui->m_airTempGauge->setValue(convertTemperature(data.intake_air_temp_f));
     m_ui->m_voltage->setText(QString::number(data.battery_voltage, 'f', 1) + "V");
@@ -362,19 +339,6 @@ void MainWindow::onEditOptionsClicked()
     // if the user doesn't cancel the options dialog...
     if (m_options->exec() == QDialog::Accepted)
     {
-        // update the speedo appropriately
-        PressureUnits pressureUnits = m_options->getPressureUnits();
-        if (pressureUnits == Psi)
-        {
-            m_ui->m_mapGauge->setMaximum(mapGaugeMaxPsi);
-        }
-        else
-        {
-            m_ui->m_mapGauge->setMaximum(mapGaugeMaxKPa);
-        }
-        m_ui->m_mapGauge->setSuffix(m_pressureUnitSuffix->value(pressureUnits));
-        m_ui->m_mapGauge->repaint();
-
         TemperatureUnits tempUnits = m_options->getTemperatureUnits();
         QString tempUnitStr = m_tempUnitSuffix->value(tempUnits);
 

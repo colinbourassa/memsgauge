@@ -78,14 +78,12 @@ private:
 
     bool m_actuatorTestsEnabled;
 
-    QHash<PressureUnits,QString> *m_pressureUnitSuffix;
     QHash<TemperatureUnits,QString> *m_tempUnitSuffix;
     QHash<TemperatureUnits,QPair<int,int> > *m_tempRange;
     QHash<TemperatureUnits,QPair<int,int> > *m_tempLimits;
 
     void buildSpeedAndTempUnitTables();
     void setupWidgets();
-    int convertPressure(int pressurePsi);
     int convertTemperature(int tempF);
 
 private slots:

@@ -9,7 +9,6 @@ OptionsDialog::OptionsDialog(QString title, QWidget *parent) : QDialog(parent),
     m_serialDeviceChanged(false),
     m_settingsGroupName("Settings"),
     m_settingSerialDev("SerialDevice"),
-    m_settingPressureUnits("PressureUnits"),
     m_settingTemperatureUnits("TemperatureUnits")
 {
     this->setWindowTitle(title);
@@ -29,9 +28,6 @@ void OptionsDialog::setupWidgets()
     m_serialDeviceLabel = new QLabel("Serial device name:", this);
     m_serialDeviceBox = new QComboBox(this);
 
-    m_pressureUnitsLabel = new QLabel("Pressure units:", this);
-    m_pressureUnitsBox = new QComboBox(this);
-
     m_temperatureUnitsLabel = new QLabel("Temperature units:", this);
     m_temperatureUnitsBox = new QComboBox(this);
 
@@ -47,11 +43,6 @@ void OptionsDialog::setupWidgets()
     m_serialDeviceBox->setEditable(true);
     m_serialDeviceBox->setMinimumWidth(150);
 
-    m_pressureUnitsBox->setEditable(false);
-    m_pressureUnitsBox->addItem("psi");
-    m_pressureUnitsBox->addItem("kPa");
-    m_pressureUnitsBox->setCurrentIndex((int)m_pressureUnits);
-
     m_temperatureUnitsBox->setEditable(false);
     m_temperatureUnitsBox->addItem("Fahrenheit");
     m_temperatureUnitsBox->addItem("Celcius");
@@ -59,9 +50,6 @@ void OptionsDialog::setupWidgets()
 
     m_grid->addWidget(m_serialDeviceLabel, row, 0);
     m_grid->addWidget(m_serialDeviceBox, row++, 1);
-
-    m_grid->addWidget(m_pressureUnitsLabel, row, 0);
-    m_grid->addWidget(m_pressureUnitsBox, row++, 1);
 
     m_grid->addWidget(m_temperatureUnitsLabel, row, 0);
     m_grid->addWidget(m_temperatureUnitsBox, row++, 1);
@@ -96,7 +84,6 @@ void OptionsDialog::accept()
     }
 
     m_tempUnits = (TemperatureUnits)(m_temperatureUnitsBox->currentIndex());
-    m_pressureUnits = (PressureUnits)(m_pressureUnitsBox->currentIndex());
 
     writeSettings();
     done(QDialog::Accepted);
@@ -111,7 +98,6 @@ void OptionsDialog::readSettings()
 
     settings.beginGroup(m_settingsGroupName);
     m_serialDeviceName = settings.value(m_settingSerialDev, "").toString();
-    m_pressureUnits = (PressureUnits)(settings.value(m_settingPressureUnits, MPH).toInt());
     m_tempUnits = (TemperatureUnits)(settings.value(m_settingTemperatureUnits, Fahrenheit).toInt());
 
     settings.endGroup();
@@ -126,7 +112,6 @@ void OptionsDialog::writeSettings()
 
     settings.beginGroup(m_settingsGroupName);
     settings.setValue(m_settingSerialDev, m_serialDeviceName);
-    settings.setValue(m_settingPressureUnits, m_pressureUnits);
     settings.setValue(m_settingTemperatureUnits, m_tempUnits);
 
     settings.endGroup();

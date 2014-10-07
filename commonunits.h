@@ -15,10 +15,4 @@ enum TemperatureUnits
     Celcius    = 1
 };
 
-enum PressureUnits
-{
-    Psi = 0,
-    KPa = 1
-};
-
 #endif // COMMONUNITS_H
