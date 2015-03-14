@@ -5,8 +5,8 @@
  */
 AboutBox::AboutBox(QStyle *parentStyle, QString title, libmemsinjection_version version, QWidget *parent) :
     QDialog(parent),
-    m_urlString(QString("http://code.google.com/p/memsgauge/")),
-    m_urlLibString(QString("http://code.google.com/p/libmemsinjection/")),
+    m_urlString(QString("https://github.com/colinbourassa/memsgauge")),
+    m_urlLibString(QString("https://github.com/colinbourassa/libmemsinjection")),
     m_aboutString(QString("A graphical interface to the Rover Modular Engine Management System."))
 {
     this->setWindowTitle(title);
