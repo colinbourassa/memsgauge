@@ -6,10 +6,10 @@ from the ECU in the Rover Modular Engine Management System (MEMS). Currently,
 only MEMS 1.6 is supported.
 
 MEMSGauge depends on another piece of software that I wrote, libmemsinjection.
-Each of these two projects has its own Google Project page:
+Each of these two projects has its own GitHub repository:
 
-http://code.google.com/p/memsgauge/
-http://code.google.com/p/libmemsinjection/
+https://github.com/colinbourassa/memsgauge
+https://github.com/colinbourassa/libmemsinjection
 
 -------
 License
@@ -45,8 +45,8 @@ be connected to the serial port in the MEMS wiring harness. This requires
 building a custom cable using one of FTDI's USB-to-RS232 converters. You can
 find the details of this on either of these two pages:
 
-http://code.google.com/p/libmemsinjection/wiki/HardwareInterface
 http://alum.wpi.edu/~colinb/mems_interface.html
+https://github.com/colinbourassa/libmemsinjection/blob/wiki/HardwareInterface.md
 
 When the USB FTDI device is connected to the PC, its driver will present it
 as a COM port if using Windows, or a /dev node if using Linux. Enter the name
