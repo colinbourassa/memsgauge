@@ -43,7 +43,12 @@ set (CPACK_SOURCE_IGNORE_FILES
 
 configure_file (
   "help.html.in"
-  "help.html"
+  "${CMAKE_CURRENT_BINARY_DIR}/help.html"
+  )
+
+configure_file (
+  "resources.qrc.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/resources.qrc"
   )
 
 find_package (Qt5Widgets)
@@ -57,30 +62,28 @@ include_directories ("${CMAKE_SOURCE_DIR}"
                      "${Qt5Widgets_INCLUDE_DIRS}")
 
 qt5_wrap_ui (UI_SOURCE mainwindow.ui)
-message (STATUS "Generated: ${UI_SOURCE}")
-qt5_add_resources (RG_RESOURCE resources.qrc)
-message (STATUS "Generated: ${RG_RESOURCE}")
+qt5_add_resources (RG_RESOURCE ${CMAKE_CURRENT_BINARY_DIR}/resources.qrc)
 
 add_definitions ("-DVER_MAJOR=${VER_MAJOR}"
                  "-DVER_MINOR=${VER_MINOR}"
                  "-DVER_PATCH=${VER_PATCH}")
 
 add_executable (${PNAME} main.cpp
-                          memsinterface.cpp
-                          helpviewer.cpp
-                          logger.cpp
-                          serialdevenumerator.cpp
-                          mainwindow.cpp
-                          aboutbox.cpp
-                          optionsdialog.cpp
-                          qledindicator/qledindicator.cpp
-                          analogwidgets/led.cpp
-                          analogwidgets/functions.cpp
-                          analogwidgets/widgetwithbackground.cpp
-                          analogwidgets/manometer.cpp
-                          analogwidgets/abstractmeter.cpp
-                          ${UI_SOURCE}
-                          ${RG_RESOURCE})
+                         memsinterface.cpp
+                         helpviewer.cpp
+                         logger.cpp
+                         serialdevenumerator.cpp
+                         mainwindow.cpp
+                         aboutbox.cpp
+                         optionsdialog.cpp
+                         qledindicator/qledindicator.cpp
+                         analogwidgets/led.cpp
+                         analogwidgets/functions.cpp
+                         analogwidgets/widgetwithbackground.cpp
+                         analogwidgets/manometer.cpp
+                         analogwidgets/abstractmeter.cpp
+                         ${UI_SOURCE}
+                         ${RG_RESOURCE})
 
 if (MINGW)
   message (STATUS "Found Windows/MinGW platform.")
