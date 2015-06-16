@@ -43,12 +43,7 @@ set (CPACK_SOURCE_IGNORE_FILES
 
 configure_file (
   "help.html.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/help.html"
-  )
-
-configure_file (
-  "resources.qrc.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/resources.qrc"
+  "${CMAKE_SOURCE_DIR}/help.html"
   )
 
 find_package (Qt5Widgets)
@@ -62,7 +57,7 @@ include_directories ("${CMAKE_SOURCE_DIR}"
                      "${Qt5Widgets_INCLUDE_DIRS}")
 
 qt5_wrap_ui (UI_SOURCE mainwindow.ui)
-qt5_add_resources (RG_RESOURCE ${CMAKE_CURRENT_BINARY_DIR}/resources.qrc)
+qt5_add_resources (RG_RESOURCE resources.qrc)
 
 add_definitions ("-DVER_MAJOR=${VER_MAJOR}"
                  "-DVER_MINOR=${VER_MINOR}"

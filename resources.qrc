@@ -1,8 +1,8 @@
 <RCC>
     <qresource prefix="/icons">
-        <file>@CMAKE_SOURCE_DIR@/key.png</file>
+        <file>key.png</file>
     </qresource>
     <qresource prefix="/help">
-        <file>@CMAKE_CURRENT_BINARY_DIR@/help.html</file>
+        <file>help.html</file>
     </qresource>
 </RCC>
