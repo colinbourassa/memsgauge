@@ -87,10 +87,10 @@ if (MINGW)
   # an additional DLL dependency
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mwindows -static-libstdc++")
 
-  set (LIBMEMSINJECTION_PATH "$ENV{SystemDrive}/memsinjection")
-  include_directories ("${LIBMEMSINJECTION_PATH}/include")
+  set (LIBROSCO_PATH "$ENV{SystemDrive}/mems-rosco")
+  include_directories ("${LIBROSCO_PATH}/include")
 
-  message (STATUS "Defaulting installation path to: ${LIBMEMSINJECTION_PATH}")
+  message (STATUS "Defaulting installation path to: ${LIBROSCO_PATH}")
   set (CMAKE_INSTALL_PREFIX "$ENV{SystemDrive}/${PNAME}")
   set (EXE_FILE "${CMAKE_CURRENT_BINARY_DIR}/${PNAME}.exe")
 
@@ -147,14 +147,14 @@ if (MINGW)
     message (SEND_ERROR "Could not find Qt qwindows platform plugin!")
   endif ()
 
-  find_library(LIBMEMSINJECTION_DLL libmemsinjection PATHS ${LIBMEMSINJECTION_PATH} ${CMAKE_INSTALL_PREFIX})
-  if (LIBMEMSINJECTION_DLL)
-    message (STATUS "Found libmemsinjection at ${LIBMEMSINJECTION_DLL}")
+  find_library(LIBROSCO_DLL librosco PATHS ${LIBROSCO_PATH} ${CMAKE_INSTALL_PREFIX})
+  if (LIBROSCO_DLL)
+    message (STATUS "Found librosco at ${LIBROSCO_DLL}")
   else ()
-    message (SEND_ERROR "Could not find libmemsinjection.dll! Check that it exists in one of the directories in your PATH.")
+    message (SEND_ERROR "Could not find librosco.dll! Check that it exists in one of the directories in your PATH.")
   endif ()
 
-  target_link_libraries (${PNAME} ${LIBMEMSINJECTION_DLL} Qt5::Widgets)
+  target_link_libraries (${PNAME} ${LIBROSCO_DLL} Qt5::Widgets)
 
   # convert Unix-style newline characters into Windows-style
   file (READ "${CMAKE_SOURCE_DIR}/README" README_CONTENTS)
@@ -172,7 +172,7 @@ if (MINGW)
                  ${QTCORE_DLL}
                  ${QTGUI_DLL}
                  ${QTWIDGETS_DLL}
-                 ${LIBMEMSINJECTION_DLL}
+                 ${LIBROSCO_DLL}
            DESTINATION ".")
   install (FILES ${QWINDOWS_DLL} DESTINATION "platforms")
 
@@ -185,7 +185,7 @@ if (MINGW)
 else()
   message (STATUS "Platform is not Windows/MinGW; trying Linux...")
 
-  target_link_libraries (${PNAME} memsinjection Qt5::Widgets)
+  target_link_libraries (${PNAME} rosco Qt5::Widgets)
 
   set (CMAKE_SKIP_RPATH TRUE)
   set (CMAKE_INSTALL_PREFIX "/usr")
@@ -225,7 +225,7 @@ else()
   set (CPACK_DEBIAN_PACKAGE_MAINTAINER "Colin Bourassa <colin.bourassa@gmail.com>")
   set (CPACK_PACKAGE_DESCRIPTION_SUMMARY "Graphical display for data read from Rover MEMS 1.6 (Modular Engine Management System)")
   set (CPACK_DEBIAN_PACKAGE_SECTION "Science")
-  set (CPACK_DEBIAN_PACKAGE_DEPENDS "libc6 (>= 2.13), libstdc++6 (>= 4.6.3), libmemsinjection (>= 0.1.0), libqt5core5 (>= 5.0.2), libqt5gui5 (>= 5.0.2), libqt5widgets5 (>= 5.0.2)")
+  set (CPACK_DEBIAN_PACKAGE_DEPENDS "libc6 (>= 2.13), libstdc++6 (>= 4.6.3), librosco (>= 0.1.0), libqt5core5 (>= 5.0.2), libqt5gui5 (>= 5.0.2), libqt5widgets5 (>= 5.0.2)")
   set (CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${VER_MAJOR}.${VER_MINOR}.${VER_PATCH}-${CMAKE_SYSTEM_NAME}-${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}")
   set (CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
   set (CPACK_RESOURCE_FILE_README "${CMAKE_SOURCE_DIR}/README")

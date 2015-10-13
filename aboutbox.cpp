@@ -3,11 +3,11 @@
 /**
  * Constructor. Receives a pointer to the QStyle of the parent form.
  */
-AboutBox::AboutBox(QStyle *parentStyle, QString title, libmemsinjection_version version, QWidget *parent) :
+AboutBox::AboutBox(QStyle *parentStyle, QString title, librosco_version version, QWidget *parent) :
     QDialog(parent),
     m_urlString(QString("https://github.com/colinbourassa/memsgauge")),
-    m_urlLibString(QString("https://github.com/colinbourassa/libmemsinjection")),
-    m_aboutString(QString("A graphical interface to the Rover Modular Engine Management System."))
+    m_urlLibString(QString("https://github.com/colinbourassa/librosco")),
+    m_aboutString(QString("A graphical interface to the Rover Modular Engine Management System 1.6."))
 {
     this->setWindowTitle(title);
     m_ver.major = version.major;
@@ -46,7 +46,7 @@ void AboutBox::setupWidgets()
     m_name->setFont(defaultFont);
 
     m_info = new QLabel(m_aboutString, this);
-    m_infoLib = new QLabel(QString("Using libmemsinjection %1.").arg(makeVersionString(m_ver.major, m_ver.minor, m_ver.patch)), this);
+    m_infoLib = new QLabel(QString("Using librosco %1.").arg(makeVersionString(m_ver.major, m_ver.minor, m_ver.patch)), this);
 
     m_url = new QLabel("<a href=\"" + m_urlString + "\">" + m_urlString + "</a>", this);
     m_url->setOpenExternalLinks(true);

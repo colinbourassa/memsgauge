@@ -6,7 +6,7 @@
 #include <QHash>
 #include <QByteArray>
 #include <QHash>
-#include "memsinjection.h"
+#include "rosco.h"
 #include "commonunits.h"
 
 class MEMSInterface : public QObject
@@ -24,8 +24,8 @@ public:
     bool isConnected();
     void disconnectFromECU();
 
-    mems_data getData()          { return m_data; }
-    libmemsinjection_version getVersion() { return mems_get_lib_version(); }
+    mems_data getData()           { return m_data; }
+    librosco_version getVersion() { return mems_get_lib_version(); }
 
     void cancelRead();
 
