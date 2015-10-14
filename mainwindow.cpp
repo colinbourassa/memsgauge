@@ -524,7 +524,7 @@ void MainWindow::onFailedToConnect(QString dev)
     else
     {
         QMessageBox::warning(this, "Error",
-            "Error connecting to ECU. Could not open serial device: " + dev,
+            "Error connecting to ECU on port " + dev + ".\nCheck cable wiring and check that ECU is on.",
             QMessageBox::Ok);
     }
 }
