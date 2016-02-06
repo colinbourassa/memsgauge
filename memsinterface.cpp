@@ -9,15 +9,11 @@
  * @param device Name of (or path to) the serial device used to comminucate
  *  with the ECU.
  */
-MEMSInterface::MEMSInterface(QString device, QObject *parent) :
-    QObject(parent),
-    m_deviceName(device),
-    m_stopPolling(false),
-    m_shutdownThread(false),
-    m_initComplete(false)
-{ 
-    memset(&m_data, 0, sizeof(mems_data));
-    memset(m_d0_response_buffer, 0, 4);
+MEMSInterface::MEMSInterface(QString device, QObject * parent):
+QObject(parent), m_deviceName(device), m_stopPolling(false), m_shutdownThread(false), m_initComplete(false)
+{
+  memset(&m_data, 0, sizeof(mems_data));
+  memset(m_d0_response_buffer, 0, 4);
 }
 
 /**
@@ -32,21 +28,21 @@ MEMSInterface::~MEMSInterface()
  */
 void MEMSInterface::onFaultCodesClearRequested()
 {
-    if (m_initComplete && mems_is_connected(&m_memsinfo))
+  if (m_initComplete && mems_is_connected(&m_memsinfo))
+  {
+    if (mems_clear_faults(&m_memsinfo))
     {
-        if (mems_clear_faults(&m_memsinfo))
-        {
-            emit faultCodesClearSuccess();
-        }
-        else
-        {
-            emit errorSendingCommand();
-        }
+      emit faultCodesClearSuccess();
     }
     else
     {
-        emit notConnected();
+      emit errorSendingCommand();
     }
+  }
+  else
+  {
+    emit notConnected();
+  }
 }
 
 /**
@@ -54,19 +50,19 @@ void MEMSInterface::onFaultCodesClearRequested()
  */
 void MEMSInterface::onIdleAirControlMovementRequest(int desiredPos)
 {
-    if (m_initComplete && mems_is_connected(&m_memsinfo))
+  if (m_initComplete && mems_is_connected(&m_memsinfo))
+  {
+    if (!mems_move_iac(&m_memsinfo, desiredPos))
     {
-        if (!mems_move_iac(&m_memsinfo, desiredPos))
-        {
-            emit errorSendingCommand();
-        }
+      emit errorSendingCommand();
     }
-    else
-    {
-        emit notConnected();
-    }
+  }
+  else
+  {
+    emit notConnected();
+  }
 
-    emit moveIACComplete();
+  emit moveIACComplete();
 }
 
 /**
@@ -76,13 +72,13 @@ void MEMSInterface::onIdleAirControlMovementRequest(int desiredPos)
  */
 bool MEMSInterface::connectToECU()
 {
-    bool status = mems_connect(&m_memsinfo, m_deviceName.toStdString().c_str()) &&
-                  mems_init_link(&m_memsinfo, m_d0_response_buffer);
-    if (status)
-    {
-        emit gotEcuId(m_d0_response_buffer);
-    }
-    return status;
+  bool status = mems_connect(&m_memsinfo, m_deviceName.toStdString().c_str()) &&
+    mems_init_link(&m_memsinfo, m_d0_response_buffer);
+  if (status)
+  {
+    emit gotEcuId(m_d0_response_buffer);
+  }
+  return status;
 }
 
 /**
@@ -90,7 +86,7 @@ bool MEMSInterface::connectToECU()
  */
 void MEMSInterface::disconnectFromECU()
 {
-    m_stopPolling = true;
+  m_stopPolling = true;
 }
 
 /**
@@ -98,14 +94,14 @@ void MEMSInterface::disconnectFromECU()
  */
 void MEMSInterface::onShutdownThreadRequest()
 {
-    if (m_serviceLoopRunning)
-    {
-        m_shutdownThread = true;
-    }
-    else
-    {
-        QThread::currentThread()->quit();
-    }
+  if (m_serviceLoopRunning)
+  {
+    m_shutdownThread = true;
+  }
+  else
+  {
+    QThread::currentThread()->quit();
+  }
 }
 
 /**
@@ -114,7 +110,7 @@ void MEMSInterface::onShutdownThreadRequest()
  */
 bool MEMSInterface::isConnected()
 {
-    return (m_initComplete && mems_is_connected(&m_memsinfo));
+  return (m_initComplete && mems_is_connected(&m_memsinfo));
 }
 
 /**
@@ -123,15 +119,15 @@ bool MEMSInterface::isConnected()
  */
 void MEMSInterface::onParentThreadStarted()
 {
-    // Initialize the interface state info struct here, so that
-    // it's in the context of the thread that will use it.
-    if (!m_initComplete)
-    {
-        mems_init(&m_memsinfo);
-        m_initComplete = true;
-    }
+  // Initialize the interface state info struct here, so that
+  // it's in the context of the thread that will use it.
+  if (!m_initComplete)
+  {
+    mems_init(&m_memsinfo);
+    m_initComplete = true;
+  }
 
-    emit interfaceThreadReady();
+  emit interfaceThreadReady();
 }
 
 /**
@@ -139,26 +135,28 @@ void MEMSInterface::onParentThreadStarted()
  */
 void MEMSInterface::onStartPollingRequest()
 {
-    if (connectToECU())
-    {
-        emit connected();
-        m_stopPolling = false;
-        m_shutdownThread = false;
-        runServiceLoop();
-    }
-    else
-    {
+  if (connectToECU())
+  {
+    emit connected();
+
+    m_stopPolling = false;
+    m_shutdownThread = false;
+    runServiceLoop();
+  }
+  else
+  {
 #ifdef WIN32
-        QString simpleDeviceName = m_deviceName;
-        if (simpleDeviceName.indexOf("\\\\.\\") == 0)
-        {
-            simpleDeviceName.remove(0, 4);
-        }
-        emit failedToConnect(simpleDeviceName);
-#else
-        emit failedToConnect(m_deviceName);
-#endif
+    QString simpleDeviceName = m_deviceName;
+
+    if (simpleDeviceName.indexOf("\\\\.\\") == 0)
+    {
+      simpleDeviceName.remove(0, 4);
     }
+    emit failedToConnect(simpleDeviceName);
+#else
+    emit failedToConnect(m_deviceName);
+#endif
+  }
 }
 
 /**
@@ -166,100 +164,100 @@ void MEMSInterface::onStartPollingRequest()
  */
 void MEMSInterface::runServiceLoop()
 {
-    bool connected = mems_is_connected(&m_memsinfo);
+  bool connected = mems_is_connected(&m_memsinfo);
 
-    m_serviceLoopRunning = true;
-    while (!m_stopPolling && !m_shutdownThread && connected)
+  m_serviceLoopRunning = true;
+  while (!m_stopPolling && !m_shutdownThread && connected)
+  {
+    if (mems_read(&m_memsinfo, &m_data))
     {
-        if (mems_read(&m_memsinfo, &m_data))
-        {
-            emit readSuccess();
-            emit dataReady();
-        }
-        else
-        {
-            emit readError();
-        }
-        QCoreApplication::processEvents();
+      emit readSuccess();
+      emit dataReady();
     }
-    m_serviceLoopRunning = false;
+    else
+    {
+      emit readError();
+    }
+    QCoreApplication::processEvents();
+  }
+  m_serviceLoopRunning = false;
 
-    if (connected)
-    {
-        mems_disconnect(&m_memsinfo);
-    }
-    emit disconnected();
+  if (connected)
+  {
+    mems_disconnect(&m_memsinfo);
+  }
+  emit disconnected();
 
-    if (m_shutdownThread)
-    {
-        QThread::currentThread()->quit();
-    }
+  if (m_shutdownThread)
+  {
+    QThread::currentThread()->quit();
+  }
 }
 
 bool MEMSInterface::actuatorOnOffDelayTest(actuator_cmd onCmd, actuator_cmd offCmd)
 {
-    bool status = false;
+  bool status = false;
 
-    if (m_initComplete && mems_is_connected(&m_memsinfo))
+  if (m_initComplete && mems_is_connected(&m_memsinfo))
+  {
+    if (mems_test_actuator(&m_memsinfo, onCmd, NULL))
     {
-        if (mems_test_actuator(&m_memsinfo, onCmd, NULL))
-        {
-            QThread::sleep(2);
-            if (mems_test_actuator(&m_memsinfo, offCmd, NULL))
-            {
-                status = true;
-            }
-        }
-
-        if (!status)
-        {
-            emit errorSendingCommand();
-        }
-    }
-    else
-    {
-        emit notConnected();
+      QThread::sleep(2);
+      if (mems_test_actuator(&m_memsinfo, offCmd, NULL))
+      {
+        status = true;
+      }
     }
 
-    return status;
+    if (!status)
+    {
+      emit errorSendingCommand();
+    }
+  }
+  else
+  {
+    emit notConnected();
+  }
+
+  return status;
 }
 
 void MEMSInterface::onFuelPumpTest()
 {
-    actuatorOnOffDelayTest(MEMS_FuelPumpOn, MEMS_FuelPumpOff);
-    emit fuelPumpTestComplete();
+  actuatorOnOffDelayTest(MEMS_FuelPumpOn, MEMS_FuelPumpOff);
+  emit fuelPumpTestComplete();
 }
 
 void MEMSInterface::onPTCRelayTest()
 {
-    actuatorOnOffDelayTest(MEMS_PTCRelayOn, MEMS_PTCRelayOff);
-    emit ptcRelayTestComplete();
+  actuatorOnOffDelayTest(MEMS_PTCRelayOn, MEMS_PTCRelayOff);
+  emit ptcRelayTestComplete();
 }
 
 void MEMSInterface::onACRelayTest()
 {
-    actuatorOnOffDelayTest(MEMS_ACRelayOn, MEMS_ACRelayOff);
-    emit acRelayTestComplete();
+  actuatorOnOffDelayTest(MEMS_ACRelayOn, MEMS_ACRelayOff);
+  emit acRelayTestComplete();
 }
 
 void MEMSInterface::onIgnitionCoilTest()
 {
-    if (m_initComplete && mems_is_connected(&m_memsinfo))
+  if (m_initComplete && mems_is_connected(&m_memsinfo))
+  {
+    if (!mems_test_actuator(&m_memsinfo, MEMS_FireCoil, NULL))
     {
-        if (!mems_test_actuator(&m_memsinfo, MEMS_FireCoil, NULL))
-        {
-            emit errorSendingCommand();
-        }
+      emit errorSendingCommand();
     }
+  }
 }
 
 void MEMSInterface::onFuelInjectorTest()
 {
-    if (m_initComplete && mems_is_connected(&m_memsinfo))
+  if (m_initComplete && mems_is_connected(&m_memsinfo))
+  {
+    if (!mems_test_actuator(&m_memsinfo, MEMS_TestInjectors, NULL))
     {
-        if (!mems_test_actuator(&m_memsinfo, MEMS_TestInjectors, NULL))
-        {
-            emit errorSendingCommand();
-        }
+      emit errorSendingCommand();
     }
+  }
 }

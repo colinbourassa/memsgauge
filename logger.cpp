@@ -6,10 +6,10 @@
  * Constructor. Sets the interface class pointer as
  * well as log directory and log file extension.
  */
-Logger::Logger(MEMSInterface *memsiface) :
-    m_logExtension(".txt"), m_logDir("logs")
+Logger::Logger(MEMSInterface * memsiface):
+m_logExtension(".txt"), m_logDir("logs")
 {
-    m_mems = memsiface;
+  m_mems = memsiface;
 }
 
 /**
@@ -18,31 +18,32 @@ Logger::Logger(MEMSInterface *memsiface) :
  */
 bool Logger::openLog(QString fileName)
 {
-    bool success = false;
+  bool success = false;
 
-    m_lastAttemptedLog = m_logDir + QDir::separator() + fileName + m_logExtension;
+  m_lastAttemptedLog = m_logDir + QDir::separator() + fileName + m_logExtension;
 
-    // if the 'logs' directory exists, or if we're able to create it...
-    if (!m_logFile.isOpen() && (QDir(m_logDir).exists() || QDir().mkdir(m_logDir)))
+  // if the 'logs' directory exists, or if we're able to create it...
+  if (!m_logFile.isOpen() && (QDir(m_logDir).exists() || QDir().mkdir(m_logDir)))
+  {
+    // set the name of the log file and open it for writing
+    bool alreadyExists = QFileInfo(m_lastAttemptedLog).exists();
+
+    m_logFile.setFileName(m_lastAttemptedLog);
+    if (m_logFile.open(QFile::WriteOnly | QFile::Append))
     {
-        // set the name of the log file and open it for writing
-        bool alreadyExists = QFileInfo(m_lastAttemptedLog).exists();
-        m_logFile.setFileName(m_lastAttemptedLog);
-        if (m_logFile.open(QFile::WriteOnly | QFile::Append))
-        {
-            m_logFileStream.setDevice(&m_logFile);
+      m_logFileStream.setDevice(&m_logFile);
 
-            if (!alreadyExists)
-            {
-                m_logFileStream << "#time,engineSpeed,waterTemp,intakeAirTemp," <<
-                                   "throttleVoltage,manifoldPressure,idleBypassPos,mainVoltage" << endl;
-            }
+      if (!alreadyExists)
+      {
+        m_logFileStream << "#time,engineSpeed,waterTemp,intakeAirTemp," <<
+          "throttleVoltage,manifoldPressure,idleBypassPos,mainVoltage" << endl;
+      }
 
-            success = true;
-        }
+      success = true;
     }
+  }
 
-    return success;
+  return success;
 }
 
 /**
@@ -50,7 +51,7 @@ bool Logger::openLog(QString fileName)
  */
 void Logger::closeLog()
 {
-    m_logFile.close();
+  m_logFile.close();
 }
 
 /**
@@ -59,11 +60,11 @@ void Logger::closeLog()
  */
 void Logger::logData()
 {
-    // TODO
-    if (m_logFile.isOpen() && (m_logFileStream.status() == QTextStream::Ok))
-    {
-        m_logFileStream << QDateTime::currentDateTime().toString("hh:mm:ss.zzz") << "," << endl;
-    }
+  // TODO
+  if (m_logFile.isOpen() && (m_logFileStream.status() == QTextStream::Ok))
+  {
+    m_logFileStream << QDateTime::currentDateTime().toString("hh:mm:ss.zzz") << "," << endl;
+  }
 }
 
 /**
@@ -72,6 +73,5 @@ void Logger::logData()
  */
 QString Logger::getLogPath()
 {
-    return m_lastAttemptedLog;
+  return m_lastAttemptedLog;
 }
-
