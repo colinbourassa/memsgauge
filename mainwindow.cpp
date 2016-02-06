@@ -12,7 +12,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-MainWindow::MainWindow(QWidget * parent):QMainWindow(parent),
+MainWindow::MainWindow(QWidget* parent):QMainWindow(parent),
 m_ui(new Ui::MainWindow),
 m_memsThread(0),
 m_mems(0), m_options(0), m_aboutBox(0), m_pleaseWaitBox(0), m_helpViewerDialog(0), m_actuatorTestsEnabled(false)
@@ -72,19 +72,19 @@ MainWindow::~MainWindow()
  */
 void MainWindow::buildSpeedAndTempUnitTables()
 {
-  m_tempUnitSuffix = new QHash < TemperatureUnits, QString >;
+  m_tempUnitSuffix = new QHash <TemperatureUnits, QString>;
   m_tempUnitSuffix->insert(Fahrenheit, " F");
-  m_tempUnitSuffix->insert(Celcius, " C");
+  m_tempUnitSuffix->insert(Celsius, " C");
 
-  m_tempRange = new QHash < TemperatureUnits, QPair < int, int >>;
+  m_tempRange = new QHash <TemperatureUnits, QPair <int, int> >;
 
   m_tempRange->insert(Fahrenheit, qMakePair(-40, 280));
-  m_tempRange->insert(Celcius, qMakePair(-40, 140));
+  m_tempRange->insert(Celsius, qMakePair(-40, 140));
 
-  m_tempLimits = new QHash < TemperatureUnits, QPair < int, int >>;
+  m_tempLimits = new QHash <TemperatureUnits, QPair <int, int> >;
 
   m_tempLimits->insert(Fahrenheit, qMakePair(180, 210));
-  m_tempLimits->insert(Celcius, qMakePair(80, 98));
+  m_tempLimits->insert(Celsius, qMakePair(80, 98));
 }
 
 /**
@@ -124,44 +124,36 @@ void MainWindow::setupWidgets()
   m_ui->m_commsGoodLed->setOnColor2(QColor(82, 204, 82));
   m_ui->m_commsGoodLed->setOffColor1(QColor(0, 102, 0));
   m_ui->m_commsGoodLed->setOffColor2(QColor(0, 51, 0));
-  m_ui->m_commsGoodLed->setDisabled(true);
   m_ui->m_commsBadLed->setOnColor1(QColor(255, 0, 0));
   m_ui->m_commsBadLed->setOnColor2(QColor(176, 0, 2));
   m_ui->m_commsBadLed->setOffColor1(QColor(20, 0, 0));
   m_ui->m_commsBadLed->setOffColor2(QColor(90, 0, 2));
-  m_ui->m_commsBadLed->setDisabled(true);
 
   m_ui->m_idleSwitchLed->setOnColor1(QColor(102, 255, 102));
   m_ui->m_idleSwitchLed->setOnColor2(QColor(82, 204, 82));
   m_ui->m_idleSwitchLed->setOffColor1(QColor(0, 102, 0));
   m_ui->m_idleSwitchLed->setOffColor2(QColor(0, 51, 0));
-  m_ui->m_idleSwitchLed->setDisabled(true);
   m_ui->m_neutralSwitchLed->setOnColor1(QColor(102, 255, 102));
   m_ui->m_neutralSwitchLed->setOnColor2(QColor(82, 204, 82));
   m_ui->m_neutralSwitchLed->setOffColor1(QColor(0, 102, 0));
   m_ui->m_neutralSwitchLed->setOffColor2(QColor(0, 51, 0));
-  m_ui->m_neutralSwitchLed->setDisabled(true);
 
   m_ui->m_faultLedATS->setOnColor1(QColor(255, 0, 0));
   m_ui->m_faultLedATS->setOnColor2(QColor(176, 0, 2));
   m_ui->m_faultLedATS->setOffColor1(QColor(20, 0, 0));
   m_ui->m_faultLedATS->setOffColor2(QColor(90, 0, 2));
-  m_ui->m_faultLedATS->setDisabled(true);
   m_ui->m_faultLedCTS->setOnColor1(QColor(255, 0, 0));
   m_ui->m_faultLedCTS->setOnColor2(QColor(176, 0, 2));
   m_ui->m_faultLedCTS->setOffColor1(QColor(20, 0, 0));
   m_ui->m_faultLedCTS->setOffColor2(QColor(90, 0, 2));
-  m_ui->m_faultLedCTS->setDisabled(true);
   m_ui->m_faultLedFuelPump->setOnColor1(QColor(255, 0, 0));
   m_ui->m_faultLedFuelPump->setOnColor2(QColor(176, 0, 2));
   m_ui->m_faultLedFuelPump->setOffColor1(QColor(20, 0, 0));
   m_ui->m_faultLedFuelPump->setOffColor2(QColor(90, 0, 2));
-  m_ui->m_faultLedFuelPump->setDisabled(true);
   m_ui->m_faultLedTps->setOnColor1(QColor(255, 0, 0));
   m_ui->m_faultLedTps->setOnColor2(QColor(176, 0, 2));
   m_ui->m_faultLedTps->setOffColor1(QColor(20, 0, 0));
   m_ui->m_faultLedTps->setOffColor2(QColor(90, 0, 2));
-  m_ui->m_faultLedTps->setDisabled(true);
 
   m_ui->m_logFileNameBox->setText(QDateTime::currentDateTime().toString("yyyy-MM-dd_hh.mm.ss"));
 
@@ -228,7 +220,7 @@ void MainWindow::onInterfaceThreadReady()
   emit requestToStartPolling();
 }
 
-void MainWindow::onEcuIdReceived(uint8_t * id)
+void MainWindow::onEcuIdReceived(uint8_t* id)
 {
   char idString[20];
 
@@ -265,7 +257,7 @@ int MainWindow::convertTemperature(int tempF)
 
   switch (m_options->getTemperatureUnits())
   {
-  case Celcius:
+  case Celsius:
     temp = (temp - 32) * (0.5555556);
     break;
   case Fahrenheit:
@@ -293,36 +285,36 @@ void MainWindow::setActuatorTestsEnabled(bool enabled)
  */
 void MainWindow::onDataReady()
 {
-  mems_data data = m_mems->getData();
-  int corrected_iac = (data.iac_position > IAC_MAXIMUM) ? IAC_MAXIMUM : data.iac_position;
-  float corrected_throttle = (data.throttle_pot_voltage > 5.0) ? 5.0 : data.throttle_pot_voltage;
+  mems_data* data = m_mems->getData();
+  int corrected_iac = (data->iac_position > IAC_MAXIMUM) ? IAC_MAXIMUM : data->iac_position;
+  float corrected_throttle = (data->throttle_pot_voltage > 5.0) ? 5.0 : data->throttle_pot_voltage;
 
-  if ((data.engine_rpm == 0) && !m_actuatorTestsEnabled)
+  if ((data->engine_rpm == 0) && !m_actuatorTestsEnabled)
   {
     setActuatorTestsEnabled(true);
   }
-  else if ((data.engine_rpm > 0) && m_actuatorTestsEnabled)
+  else if ((data->engine_rpm > 0) && m_actuatorTestsEnabled)
   {
     setActuatorTestsEnabled(false);
   }
 
   m_ui->m_throttleBar->setValue(corrected_throttle / 5.00 * 100);
-  m_ui->m_throttlePotVolts->setText(QString::number(data.throttle_pot_voltage, 'f', 2) + "V");
+  m_ui->m_throttlePotVolts->setText(QString::number(data->throttle_pot_voltage, 'f', 2) + "V");
   m_ui->m_idleBypassPosBar->setValue((float)corrected_iac / (float)IAC_MAXIMUM * 100);
-  m_ui->m_iacPositionSteps->setText(QString::number(data.iac_position));
-  m_ui->m_revCounter->setValue(data.engine_rpm);
-  m_ui->m_mapGauge->setValue(data.map_kpa);
-  m_ui->m_waterTempGauge->setValue(convertTemperature(data.coolant_temp_f));
-  m_ui->m_airTempGauge->setValue(convertTemperature(data.intake_air_temp_f));
-  m_ui->m_voltage->setText(QString::number(data.battery_voltage, 'f', 1) + "V");
+  m_ui->m_iacPositionSteps->setText(QString::number(data->iac_position));
+  m_ui->m_revCounter->setValue(data->engine_rpm);
+  m_ui->m_mapGauge->setValue(data->map_kpa);
+  m_ui->m_waterTempGauge->setValue(convertTemperature(data->coolant_temp_f));
+  m_ui->m_airTempGauge->setValue(convertTemperature(data->intake_air_temp_f));
+  m_ui->m_voltage->setText(QString::number(data->battery_voltage, 'f', 1) + "V");
 
-  m_ui->m_faultLedCTS->setEnabled(data.fault_codes & 0x01);
-  m_ui->m_faultLedATS->setEnabled(data.fault_codes & 0x02);
-  m_ui->m_faultLedFuelPump->setEnabled(data.fault_codes & 0x04);
-  m_ui->m_faultLedTps->setEnabled(data.fault_codes & 0x08);
+  m_ui->m_faultLedCTS->setChecked((data->fault_codes & 0x01) != 0);
+  m_ui->m_faultLedATS->setChecked((data->fault_codes & 0x02) != 0);
+  m_ui->m_faultLedFuelPump->setChecked((data->fault_codes & 0x04) != 0);
+  m_ui->m_faultLedTps->setChecked((data->fault_codes & 0x08) != 0);
 
-  m_ui->m_idleSwitchLed->setChecked(data.idle_switch);
-  m_ui->m_neutralSwitchLed->setChecked(data.park_neutral_switch);
+  m_ui->m_idleSwitchLed->setChecked(data->idle_switch);
+  m_ui->m_neutralSwitchLed->setChecked(data->park_neutral_switch);
 
   m_logger->logData();
 }
@@ -344,6 +336,8 @@ void MainWindow::onEditOptionsClicked()
     int tempMax = m_tempRange->value(tempUnits).second;
     int tempNominal = m_tempLimits->value(tempUnits).first;
     int tempCritical = m_tempLimits->value(tempUnits).second;
+
+    m_logger->setTemperatureUnits(tempUnits);
 
     m_ui->m_airTempGauge->setSuffix(tempUnitStr);
     m_ui->m_airTempGauge->setValue(tempMin);
@@ -378,7 +372,7 @@ void MainWindow::onEditOptionsClicked()
  * the other thread.
  * @param event The event itself.
  */
-void MainWindow::closeEvent(QCloseEvent * event)
+void MainWindow::closeEvent(QCloseEvent* event)
 {
   m_logger->closeLog();
 
@@ -429,6 +423,10 @@ void MainWindow::onDisconnect()
   m_ui->m_throttlePotVolts->setText("0.00V");
   m_ui->m_iacPositionSteps->setText("0");
   m_ui->m_voltage->setText("0.0V");
+  m_ui->m_faultLedCTS->setChecked(false);
+  m_ui->m_faultLedATS->setChecked(false);
+  m_ui->m_faultLedFuelPump->setChecked(false);
+  m_ui->m_faultLedTps->setChecked(false);
 
   setActuatorTestsEnabled(false);
 

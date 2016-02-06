@@ -6,7 +6,7 @@
  * Constructor. Sets the interface class pointer as
  * well as log directory and log file extension.
  */
-Logger::Logger(MEMSInterface * memsiface):
+Logger::Logger(MEMSInterface* memsiface):
 m_logExtension(".txt"), m_logDir("logs")
 {
   m_mems = memsiface;
@@ -36,7 +36,8 @@ bool Logger::openLog(QString fileName)
       if (!alreadyExists)
       {
         m_logFileStream << "#time,engineSpeed,waterTemp,intakeAirTemp," <<
-          "throttleVoltage,manifoldPressure,idleBypassPos,mainVoltage" << endl;
+          "throttleVoltage,manifoldPressure,idleBypassPos,mainVoltage," <<
+          "idleswitch,closedloop,lambdavoltage" << endl;
       }
 
       success = true;
@@ -55,15 +56,41 @@ void Logger::closeLog()
 }
 
 /**
+ * Converts degrees F to degrees C if necessary
+ */
+uint8_t Logger::convertTemp(uint8_t degrees)
+{
+  if (m_tempUnits == Celsius)
+  {
+    return ((degrees - 32) * 0.555556);
+  }
+  else
+  {
+    return degrees;
+  }
+}
+
+/**
  * Commands the logger to query the interface for the currently
  * buffered data, and write it to the file.
  */
 void Logger::logData()
 {
-  // TODO
+  mems_data* data = m_mems->getData();
+
   if (m_logFile.isOpen() && (m_logFileStream.status() == QTextStream::Ok))
   {
-    m_logFileStream << QDateTime::currentDateTime().toString("hh:mm:ss.zzz") << "," << endl;
+    m_logFileStream << QDateTime::currentDateTime().toString("hh:mm:ss.zzz") << "," <<
+      data->engine_rpm << "," <<
+      convertTemp(data->coolant_temp_f) << "," <<
+      convertTemp(data->intake_air_temp_f) << "," <<
+      data->throttle_pot_voltage << "," <<
+      data->map_kpa << "," <<
+      data->iac_position << "," <<
+      data->battery_voltage << "," <<
+      data->idle_switch << "," <<
+      data->closed_loop << "," <<
+      data->lambda_voltage_mv << endl;
   }
 }
 

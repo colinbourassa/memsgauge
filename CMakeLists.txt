@@ -7,8 +7,8 @@ project (${PNAME})
 add_definitions (-DPROJECTNAME=\"${PROJECTNAME}\")
 
 set (VER_MAJOR 0)
-set (VER_MINOR 1)
-set (VER_PATCH 1)
+set (VER_MINOR 2)
+set (VER_PATCH 0)
 
 set (CMAKE_INCLUDE_CURRENT_DIR ON)
 set (CMAKE_AUTOMOC ON)

@@ -44,7 +44,7 @@ void OptionsDialog::setupWidgets()
 
   m_temperatureUnitsBox->setEditable(false);
   m_temperatureUnitsBox->addItem("Fahrenheit");
-  m_temperatureUnitsBox->addItem("Celcius");
+  m_temperatureUnitsBox->addItem("Celsius");
   m_temperatureUnitsBox->setCurrentIndex((int)m_tempUnits);
 
   m_grid->addWidget(m_serialDeviceLabel, row, 0);

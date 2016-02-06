@@ -24,7 +24,7 @@ public:
     bool isConnected();
     void disconnectFromECU();
 
-    mems_data getData()           { return m_data; }
+    mems_data* getData()          { return &m_data; }
     librosco_version getVersion() { return mems_get_lib_version(); }
 
     void cancelRead();
