@@ -19,7 +19,10 @@ m_mems(0), m_options(0), m_aboutBox(0), m_pleaseWaitBox(0), m_helpViewerDialog(0
 {
   buildSpeedAndTempUnitTables();
   m_ui->setupUi(this);
-  this->setWindowTitle(PROJECTNAME);
+  this->setWindowTitle(PROJECTNAME + QString(" ") +
+      QString::number(VER_MAJOR) + "." +
+      QString::number(VER_MINOR) + "." +
+      QString::number(VER_PATCH));
 
   m_options = new OptionsDialog(this->windowTitle(), this);
   m_mems = new MEMSInterface(m_options->getSerialDeviceName());
