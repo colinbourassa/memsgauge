@@ -15,3 +15,5 @@ ui_*.h
 qrc*_resources.cpp
 help.html
 *.deb
+build/
+build-win32/
