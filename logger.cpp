@@ -37,7 +37,7 @@ bool Logger::openLog(QString fileName)
       {
         m_logFileStream << "#time,engineSpeed,waterTemp,intakeAirTemp," <<
           "throttleVoltage,manifoldPressure,idleBypassPos,mainVoltage," <<
-          "idleswitch,closedloop,lambdavoltage" << endl;
+          "idleswitch,closedloop,lambdaVoltage_mV" << endl;
       }
 
       success = true;
