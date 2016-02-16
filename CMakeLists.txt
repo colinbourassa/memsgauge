@@ -89,14 +89,17 @@ if (MINGW)
   # prevent the final executable from launching a terminal window in parallel with the main GUI
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mwindows")
 
+  # -fPIC appears to be redundant when building win32 binaries, so disable that flag
+  string (REGEX REPLACE "-fPIC" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
+
   set (LIBROSCO_PATH "$ENV{SystemDrive}/mems-rosco")
   include_directories ("${LIBROSCO_PATH}/include")
 
-  message (STATUS "Defaulting installation path to: ${LIBROSCO_PATH}")
+  message (STATUS "Defaulting installation path to: $ENV{SystemDrive}/${PNAME}")
   set (CMAKE_INSTALL_PREFIX "$ENV{SystemDrive}/${PNAME}")
   set (EXE_FILE "${CMAKE_CURRENT_BINARY_DIR}/${PNAME}.exe")
 
-# When we call find_library() below, we're only looking for DLLs, so set the suffix list appropriately
+  # When we call find_library() below, we're only looking for DLLs, so set the suffix list appropriately
   set (CMAKE_FIND_LIBRARY_SUFFIXES ".dll")
   message (STATUS "Limiting find_library() suffixes to ${CMAKE_FIND_LIBRARY_SUFFIXES}")
 
