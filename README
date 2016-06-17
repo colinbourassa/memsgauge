@@ -51,7 +51,7 @@ be connected to the serial port in the MEMS wiring harness. This requires
 building a custom cable using one of FTDI's USB-to-RS232 converters. You can
 find the details of this on either of these two pages:
 
-http://alum.wpi.edu/~colinb/mems_interface.html
+http://alum.wpi.edu/~colinb/rover-mems-16-diagnostic-protocol.html
 https://github.com/colinbourassa/librosco/blob/wiki/HardwareInterface.md
 
 When the USB FTDI device is connected to the PC, its driver will present it
