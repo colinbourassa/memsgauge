@@ -49,9 +49,8 @@ Usage and features
 For MEMSGauge to do anything useful, the computer on which it's running must
 be connected to the serial port in the MEMS wiring harness. This requires
 building a custom cable using one of FTDI's USB-to-RS232 converters. You can
-find the details of this on either of these two pages:
+find the details on this page:
 
-http://alum.wpi.edu/~colinb/rover-mems-16-diagnostic-protocol.html
 https://github.com/colinbourassa/librosco/blob/wiki/HardwareInterface.md
 
 When the USB FTDI device is connected to the PC, its driver will present it

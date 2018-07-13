@@ -162,7 +162,7 @@ void MainWindow::setupWidgets()
 
   m_ui->m_mapGauge->setMinimum(0.0);
   m_ui->m_mapGauge->setMaximum(140.0);
-  m_ui->m_mapGauge->setSuffix("kPa");
+  m_ui->m_mapGauge->setSuffix(" kPa");
   m_ui->m_mapGauge->setNominal(1000.0);
   m_ui->m_mapGauge->setCritical(1000.0);
 

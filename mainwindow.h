@@ -73,9 +73,6 @@ private:
 
     Logger *m_logger;
 
-    static const float mapGaugeMaxPsi = 16.0;
-    static const float mapGaugeMaxKPa = 160.0;
-
     bool m_actuatorTestsEnabled;
 
     QHash<TemperatureUnits,QString> *m_tempUnitSuffix;
