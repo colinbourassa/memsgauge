@@ -250,20 +250,20 @@ void MainWindow::onExitSelected()
 }
 
 /**
- * Converts temperature in Fahrenheit degrees to the desired units.
- * @param tempF Temperature in Fahrenheit degrees
+ * Converts temperature in Celsius degrees to the desired units.
+ * @param tempC Temperature in Celsius degrees
  * @return Temperature in the desired units
  */
-int MainWindow::convertTemperature(int tempF)
+int MainWindow::convertTemperature(int tempC)
 {
-  double temp = tempF;
+  float temp = tempC;
 
   switch (m_options->getTemperatureUnits())
   {
-  case Celsius:
-    temp = (temp - 32) * (0.5555556);
-    break;
   case Fahrenheit:
+    temp = (temp * 1.8f) + 32;
+    break;
+  case Celsius:
   default:
     break;
   }
@@ -307,8 +307,8 @@ void MainWindow::onDataReady()
   m_ui->m_iacPositionSteps->setText(QString::number(data->iac_position));
   m_ui->m_revCounter->setValue(data->engine_rpm);
   m_ui->m_mapGauge->setValue(data->map_kpa);
-  m_ui->m_waterTempGauge->setValue(convertTemperature(data->coolant_temp_f));
-  m_ui->m_airTempGauge->setValue(convertTemperature(data->intake_air_temp_f));
+  m_ui->m_waterTempGauge->setValue(convertTemperature(data->coolant_temp_c));
+  m_ui->m_airTempGauge->setValue(convertTemperature(data->intake_air_temp_c));
   m_ui->m_voltage->setText(QString::number(data->battery_voltage, 'f', 1) + "V");
 
   m_ui->m_faultLedCTS->setChecked((data->fault_codes & 0x01) != 0);

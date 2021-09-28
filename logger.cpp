@@ -26,7 +26,7 @@ bool Logger::openLog(QString fileName)
   if (!m_logFile.isOpen() && (QDir(m_logDir).exists() || QDir().mkdir(m_logDir)))
   {
     // set the name of the log file and open it for writing
-    bool alreadyExists = QFileInfo(m_lastAttemptedLog).exists();
+    const bool alreadyExists = QFileInfo(m_lastAttemptedLog).exists();
 
     m_logFile.setFileName(m_lastAttemptedLog);
     if (m_logFile.open(QFile::WriteOnly | QFile::Append))
@@ -37,7 +37,7 @@ bool Logger::openLog(QString fileName)
       {
         m_logFileStream << "#time,engineSpeed,waterTemp,intakeAirTemp," <<
           "throttleVoltage,manifoldPressure,idleBypassPos,mainVoltage," <<
-          "idleswitch,closedloop,lambdaVoltage_mV" << endl;
+          "idleswitch,closedloop,lambdaVoltage_mV" << Qt::endl;
       }
 
       success = true;
@@ -62,11 +62,11 @@ uint8_t Logger::convertTemp(uint8_t degrees)
 {
   if (m_tempUnits == Celsius)
   {
-    return ((degrees - 32) * 0.555556);
+    return degrees;
   }
   else
   {
-    return degrees;
+    return ((degrees * 1.8) + 32);
   }
 }
 
@@ -82,15 +82,15 @@ void Logger::logData()
   {
     m_logFileStream << QDateTime::currentDateTime().toString("hh:mm:ss.zzz") << "," <<
       data->engine_rpm << "," <<
-      convertTemp(data->coolant_temp_f) << "," <<
-      convertTemp(data->intake_air_temp_f) << "," <<
+      convertTemp(data->coolant_temp_c) << "," <<
+      convertTemp(data->intake_air_temp_c) << "," <<
       data->throttle_pot_voltage << "," <<
       data->map_kpa << "," <<
       data->iac_position << "," <<
       data->battery_voltage << "," <<
       data->idle_switch << "," <<
       data->closed_loop << "," <<
-      data->lambda_voltage_mv << endl;
+      data->lambda_voltage_mv << Qt::endl;
   }
 }
 
